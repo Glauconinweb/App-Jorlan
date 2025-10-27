@@ -8,6 +8,76 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="icon" type="image/png" href="/imagem/jjj.jpg" />
+    <style>
+      /* Ajustes mobile */
+      body {
+        padding: 0 10px;
+      }
+
+      header h1 {
+        font-size: 1.5em;
+      }
+
+      nav a {
+        display: inline-block;
+        margin: 5px 10px;
+        font-size: 0.9em;
+      }
+
+      input,
+      textarea,
+      button {
+        font-size: 1em;
+        width: 100%;
+        margin-bottom: 8px;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .tabs {
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      .tab-button {
+        flex: 1 1 auto;
+        margin: 5px 2px;
+      }
+
+      .tab-content {
+        margin-top: 10px;
+      }
+
+      .exercicio-item input {
+        width: 100%;
+        margin-bottom: 5px;
+      }
+
+      table {
+        width: 100%;
+        overflow-x: auto;
+        display: block;
+      }
+
+      table th,
+      table td {
+        white-space: nowrap;
+      }
+
+      @media (max-width: 600px) {
+        nav a {
+          display: block;
+          margin: 5px 0;
+          text-align: center;
+        }
+
+        .tab-button {
+          flex: 1 1 100%;
+        }
+      }
+    </style>
   </head>
 
   <body>
