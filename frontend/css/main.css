@@ -19,10 +19,15 @@
 
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background-color: var(--color-dark);
-  color: var(--color-light);
+  background-color: var(--color-dark); /* Fundo base para áreas sem imagem */
+  color: var(--color-light); /* Cor do texto no modo escuro */
   margin: 0;
   padding: 0;
+  background-image: url(/frontend/imagem/f.s.jorlan.jpg);
+  background-size: cover; /* Faz a imagem preencher todo o viewport, cortando se necessário */
+  background-repeat: no-repeat; /* Impede a repetição da imagem */
+  background-attachment: fixed; /* Fixa a imagem no viewport para um efeito paralaxe */
+  background-position: center center; /* Centraliza a imagem */
 }
 
 header {
