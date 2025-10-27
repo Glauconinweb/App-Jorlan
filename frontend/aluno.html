@@ -4,9 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title id="aluno-titulo">Acompanhamento do Aluno</title>
-    <link rel="stylesheet" href="/frontend/css/main.css" />
+    <link rel="stylesheet" href="/css/main.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="icon" type="image/png" href="/frontend/imagem/jjj.jpg" />
   </head>
 
   <body>
@@ -85,7 +86,7 @@
         </div>
 
         <button id="gerar-planilha-btn">
-          Gerar e Enviar Planilha (Simulação)
+          Baixar Planilha de Treino em PDF
         </button>
       </div>
       <br />
@@ -386,6 +387,136 @@
 
       carregarDados();
     </script>
+    <!-- Adicione no final do <body> do seu index.html -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // ----------------------------------------------------
+        // 1. Lógica de Abas (Divisão de Treinos)
+        // ----------------------------------------------------
+        const tabButtons = document.querySelectorAll(".tab-button");
+        const tabContents = document.querySelectorAll(".tab-content");
+
+        tabButtons.forEach((button) => {
+          button.addEventListener("click", () => {
+            const targetId = button.getAttribute("data-tab");
+
+            // Desativa todos
+            tabButtons.forEach((btn) => btn.classList.remove("active"));
+            tabContents.forEach((content) =>
+              content.classList.remove("active")
+            );
+
+            // Ativa o botão e o conteúdo correspondente
+            button.classList.add("active");
+            document.getElementById(targetId).classList.add("active");
+          });
+        });
+
+        // ----------------------------------------------------
+        // 2. Adicionar e Remover Exercícios
+        // ----------------------------------------------------
+        const addExercicioBtns =
+          document.querySelectorAll(".add-exercicio-btn");
+        const exercicioCounts = { "tab-a": 0, "tab-b": 0, "tab-c": 0 };
+
+        const createExercicioHTML = (tabId) => {
+          exercicioCounts[tabId]++;
+          const count = exercicioCounts[tabId];
+          const uniqueId = `${tabId}-ex-${count}`;
+          return `
+        <div class="exercicio-item" data-unique-id="${uniqueId}">
+          <div class="exercicio-header">
+            <h4>Exercício ${count}</h4>
+            <button type="button" class="remover-exercicio-btn" data-id="${uniqueId}">Remover</button>
+          </div>
+
+          <label>Nome do Exercício:</label>
+          <input type="text" placeholder="Ex: Agachamento Livre, Supino Reto, Remada Curvada">
+
+          <label>Séries:</label>
+          <input type="number" value="3" min="1" style="width: 60px; display: inline-block;">
+
+          <label>Repetições:</label>
+          <input type="text" value="10-12" placeholder="Ex: 8-12 ou 10 Reps">
+
+          <label>Carga (Opcional):</label>
+          <input type="text" placeholder="Ex: 20kg (cada lado)">
+
+          <label>Intervalo (seg):</label>
+          <input type="number" value="60" min="10" style="width: 60px; display: inline-block;">
+
+          <label>Observação/Técnica:</label>
+          <input type="text" placeholder="Ex: Cadência 3-1-1; Falha Concêntrica">
+        </div>
+      `;
+        };
+
+        addExercicioBtns.forEach((btn) => {
+          btn.addEventListener("click", (e) => {
+            const tabId = e.target.getAttribute("data-target");
+            const lista = document.querySelector(`#${tabId} .exercicios-lista`);
+            lista.insertAdjacentHTML("beforeend", createExercicioHTML(tabId));
+          });
+        });
+
+        // ----------------------------------------------------
+        // 3. Remover exercício
+        // ----------------------------------------------------
+        document.body.addEventListener("click", (e) => {
+          if (e.target.classList.contains("remover-exercicio-btn")) {
+            const uniqueId = e.target.getAttribute("data-id");
+            const elementToRemove = document.querySelector(
+              `.exercicio-item[data-unique-id="${uniqueId}"]`
+            );
+            if (elementToRemove) elementToRemove.remove();
+          }
+        });
+
+        // ----------------------------------------------------
+        // 4. Gerar e baixar PDF (funciona no celular)
+        // ----------------------------------------------------
+        document
+          .getElementById("gerar-planilha-btn")
+          .addEventListener("click", async () => {
+            const { jsPDF } = window.jspdf;
+
+            const conteudo = document.querySelector("main") || document.body;
+            const canvas = await html2canvas(conteudo, { scale: 2 });
+
+            const imgData = canvas.toDataURL("image/png");
+            const pdf = new jsPDF("p", "mm", "a4");
+
+            // Calcular proporção da imagem para caber na folha
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const imgWidth = pageWidth;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+            let position = 0;
+            if (imgHeight < pageHeight) {
+              pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+            } else {
+              let heightLeft = imgHeight;
+              let y = 0;
+              while (heightLeft > 0) {
+                pdf.addImage(imgData, "PNG", 0, y, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                if (heightLeft > 0) {
+                  pdf.addPage();
+                  y -= pageHeight;
+                }
+              }
+            }
+
+            const nomeAluno =
+              document.getElementById("aluno")?.value || "treino";
+            pdf.save(`${nomeAluno}_planilha_treino.pdf`);
+          });
+      });
+    </script>
+
     <script src="script.js"></script>
   </body>
 </html>
