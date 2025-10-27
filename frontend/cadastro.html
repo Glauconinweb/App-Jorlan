@@ -1,46 +1,73 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-   
   <head>
-       
     <meta charset="UTF-8" />
-       
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-       
     <title>Treinador Pro - Cadastro</title>
-           
     <link rel="stylesheet" href="/css/main.css" />
-
-     
     <link rel="icon" type="image/png" href="/imagem/jjj.jpg" />
+    <style>
+      /* Ajustes mobile para formulário */
+      body {
+        padding: 0 10px;
+      }
+
+      header h1 {
+        font-size: 1.6em;
+      }
+
+      nav a {
+        display: inline-block;
+        margin: 5px 10px;
+        font-size: 0.9em;
+      }
+
+      .card {
+        padding: 15px;
+      }
+
+      input,
+      textarea,
+      button {
+        font-size: 1em;
+      }
+
+      button {
+        width: 100%;
+        margin-top: 10px;
+      }
+
+      @media (max-width: 600px) {
+        nav a {
+          display: block;
+          width: 100%;
+          text-align: center;
+          margin: 5px 0;
+        }
+        input,
+        textarea,
+        button {
+          width: 100%;
+        }
+      }
+    </style>
   </head>
-   
   <body>
-       
     <header>
-           
       <h1>Treinador Pro</h1>
-           
       <nav>
-                <a href="index.html">Dashboard</a>        
-        <a href="cadastro.html">Novo Aluno</a>      
+        <a href="index.html">Dashboard</a>
+        <a href="cadastro.html">Novo Aluno</a>
       </nav>
-         
     </header>
-       
+
     <main>
-           
       <div class="card">
-               
         <h2>Cadastrar Novo Aluno</h2>
-               
         <form id="form-cadastro">
-                   
-          <input type="text" id="nome" placeholder="Nome do Aluno" required />  
-                 
-          <input type="email" id="email" placeholder="Email (Opcional)" />      
-              <input type="number" id="alturaCm" placeholder="Altura (cm)" />  
-                 
+          <input type="text" id="nome" placeholder="Nome do Aluno" required />
+          <input type="email" id="email" placeholder="Email (Opcional)" />
+          <input type="number" id="alturaCm" placeholder="Altura (cm)" />
           <input
             type="text"
             id="objetivo"
@@ -55,17 +82,14 @@
             placeholder="Estrutura do Treino A, B, C... (este texto será o treino inicial do aluno e será usado no PDF)"
             rows="4"
           ></textarea>
-                    <button type="submit">Cadastrar Aluno</button>        
+
+          <button type="submit">Cadastrar Aluno</button>
         </form>
-               
         <p id="msg-cadastro" style="margin-top: 15px"></p>
-             
       </div>
-         
     </main>
-       
+
     <script>
-      // URL do backend no Render
       const API_URL = "https://app-jorlan.onrender.com/api/alunos";
 
       document
@@ -78,7 +102,6 @@
             email: document.getElementById("email").value,
             alturaCm: document.getElementById("alturaCm").value,
             objetivo: document.getElementById("objetivo").value,
-            // ✅ NOVO: Puxa o conteúdo do Treino (pode ser vazio)
             treinoHtml: document.getElementById("treinoHtml").value,
           };
 
@@ -93,7 +116,7 @@
               msg.textContent =
                 "Aluno cadastrado com sucesso! Redirecionando...";
               msg.style.color = "green";
-              document.getElementById("form-cadastro").reset(); // Redireciona para o dashboard após 2 segundos
+              document.getElementById("form-cadastro").reset();
 
               setTimeout(() => {
                 window.location.href = "index.html";
@@ -109,6 +132,5 @@
           }
         });
     </script>
-     
   </body>
 </html>

@@ -1,66 +1,96 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-   
   <head>
-       
     <meta charset="UTF-8" />
-       
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-       
     <title>Treinador Pro - Dashboard</title>
-           
     <link rel="stylesheet" href="/css/main.css" />
-
-     
     <link rel="icon" type="image/png" href="/imagem/jjj.jpg" />
+    <style>
+      /* Ajustes extras mobile */
+      body {
+        padding: 0 10px;
+      }
+
+      header h1 {
+        font-size: 1.6em;
+      }
+
+      nav a {
+        display: inline-block;
+        margin: 5px 10px;
+        font-size: 0.9em;
+      }
+
+      .card {
+        padding: 15px;
+      }
+
+      table {
+        font-size: 0.85em;
+      }
+
+      td,
+      th {
+        padding: 10px 8px;
+        word-wrap: break-word;
+      }
+
+      /* Tabela responsiva */
+      .table-responsive-wrapper {
+        overflow-x: auto;
+        width: 100%;
+      }
+
+      @media (max-width: 600px) {
+        nav a {
+          display: block;
+          width: 100%;
+          text-align: center;
+          margin: 5px 0;
+        }
+
+        table {
+          font-size: 0.8em;
+        }
+
+        td button,
+        td a.btn-acao {
+          display: block;
+          width: 100%;
+          margin-top: 5px;
+        }
+      }
+    </style>
   </head>
-   
   <body>
-       
     <header>
-           
       <h1>Treinador Pro</h1>
-           
       <nav>
-                <a href="index.html">Dashboard</a>        
-        <a href="cadastro.html">Novo Aluno</a>      
+        <a href="index.html">Dashboard</a>
+        <a href="cadastro.html">Novo Aluno</a>
       </nav>
-         
     </header>
-       
+
     <main>
-           
       <div class="card">
-               
         <h2>Lista de Alunos</h2>
-               
-        <table id="tabela-alunos">
-                   
-          <thead>
-                       
-            <tr>
-                           
-              <th>Nome</th>
-                           
-              <th>Email</th>
-                           
-              <th>Ação</th>
-                         
-            </tr>
-                     
-          </thead>
-                   
-          <tbody></tbody>
-                 
-        </table>
-             
+        <div class="table-responsive-wrapper">
+          <table id="tabela-alunos">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Ação</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
-         
     </main>
 
-       
     <script>
-      // URL do backend no Render (Usando a URL fixa que você forneceu)
       const API_URL = "https://app-jorlan.onrender.com/api/alunos";
 
       async function listarAlunos() {
@@ -68,15 +98,15 @@
           .getElementById("tabela-alunos")
           .querySelector("tbody");
         tbody.innerHTML = '<tr><td colspan="3">Carregando...</td></tr>';
+
         try {
           const response = await fetch(API_URL);
-          // Verifica se a resposta foi bem-sucedida (status 200-299)
-          if (!response.ok) {
+          if (!response.ok)
             throw new Error(`Falha ao buscar dados: ${response.status}`);
-          }
 
           const alunos = await response.json();
           tbody.innerHTML = "";
+
           if (!alunos || alunos.length === 0) {
             tbody.innerHTML =
               '<tr><td colspan="3">Nenhum aluno cadastrado.</td></tr>';
@@ -86,14 +116,14 @@
           alunos.forEach((aluno) => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
-              <td>${aluno.nome}</td>
-              <td>${aluno.email || "-"}</td>
-              <td>
-                <a href="aluno.html?id=${aluno.id}" class="btn-acao">
-                  Acompanhar / Planilha
-                </a>
-              </td>
-            `;
+            <td>${aluno.nome}</td>
+            <td>${aluno.email || "-"}</td>
+            <td>
+              <a href="aluno.html?id=${aluno.id}" class="btn-acao">
+                Acompanhar / Planilha
+              </a>
+            </td>
+          `;
             tbody.appendChild(tr);
           });
         } catch (error) {
@@ -104,6 +134,5 @@
 
       listarAlunos();
     </script>
-     
   </body>
 </html>
