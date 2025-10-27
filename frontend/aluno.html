@@ -1,82 +1,88 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-   
   <head>
-       
     <meta charset="UTF-8" />
-       
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-       
     <title id="aluno-titulo">Acompanhamento do Aluno</title>
-       
     <link rel="stylesheet" href="/css/main.css" />
-       
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   </head>
-   
+
   <body>
-       
     <header>
-           
       <h1>Treinador Pro</h1>
-           
       <nav>
-                <a href="index.html">Dashboard</a>        
-        <a href="cadastro.html">Novo Aluno</a>      
+        <a href="index.html">Dashboard</a>
+        <a href="cadastro.html">Novo Aluno</a>
       </nav>
-         
     </header>
-       
+
     <main>
-           
       <h2 id="aluno-nome-header">Detalhes do Aluno</h2>
 
-           
+      <!-- ==================== FICHA E TREINO ==================== -->
       <div class="card">
-               
         <h3>Ficha e Treino (Editar)</h3>
-               
         <form id="form-edicao">
-                   
           <input
             type="text"
             id="edit-nome"
             placeholder="Nome Completo"
             required
           />
-                    <input type="email" id="edit-email" placeholder="Email" />  
-                 
-          <input type="number" id="edit-alturaCm" placeholder="Altura (cm)" />  
-                 
+          <input type="email" id="edit-email" placeholder="Email" />
+          <input type="number" id="edit-alturaCm" placeholder="Altura (cm)" />
           <input type="text" id="edit-objetivo" placeholder="Objetivo" />
 
-                   
           <h4 style="color: var(--primary-color); margin-top: 20px">
-                        Detalhes do Treino (Treino A, B, C...)          
+            Detalhes do Treino (Treino A, B, C...)
           </h4>
-                   
           <textarea
             id="edit-treinoHtml"
             placeholder="Digite aqui a estrutura do Treino A, Treino B, Treino C, etc."
             rows="8"
           ></textarea>
 
-                    <button type="submit">Salvar Ficha e Treino</button>        
-           
+          <button type="submit">Salvar Ficha e Treino</button>
           <p id="msg-edicao" style="margin-top: 10px"></p>
-                 
         </form>
-             
+
+        <!-- NOVA SEÇÃO: Visualização estruturada do treino -->
+        <div id="visualizacao-treino" style="margin-top: 30px">
+          <h3 style="color: var(--primary-color)">
+            Visualização Estruturada do Treino
+          </h3>
+          <div
+            id="treino-estruturado"
+            style="padding: 15px; background: #fafafa; border-radius: 10px"
+          ></div>
+          <button
+            id="btn-pdf-treino"
+            style="
+              margin-top: 10px;
+              background: var(--primary-color);
+              color: white;
+              padding: 8px 14px;
+              border: none;
+              border-radius: 5px;
+              cursor: pointer;
+            "
+          >
+            Baixar Treino em PDF
+          </button>
+
+          <h2>Exercícios</h2>
+          <div id="exercicios-lista"></div>
+
+          <button id="add-exercicio">Adicionar Exercício</button>
+        </div>
       </div>
 
-           
+      <!-- ==================== EVOLUÇÃO ==================== -->
       <div class="card">
-               
         <h3>Registrar Nova Evolução (Planilha de Entrada)</h3>
-               
         <form id="form-evolucao">
-                   
           <input
             type="number"
             step="0.1"
@@ -84,75 +90,50 @@
             placeholder="Peso (Kg)"
             required
           />
-                   
           <input
             type="number"
             step="0.1"
             id="gordura"
             placeholder="% Gordura (Opcional)"
           />
-                   
-          <textarea id="observacoes" placeholder="Observações"></textarea>      
-              <button type="submit">Adicionar Registro</button>          
+          <textarea id="observacoes" placeholder="Observações"></textarea>
+          <button type="submit">Adicionar Registro</button>
           <a
             href="#"
             id="btn-download-pdf"
             class="btn-acao"
             target="_blank"
             style="margin-left: 10px"
+            >Baixar Relatório PDF</a
           >
-                        Baixar Relatório PDF          
-          </a>
-                 
         </form>
-               
         <p id="msg-evolucao"></p>
-             
       </div>
 
-           
+      <!-- ==================== GRÁFICO E HISTÓRICO ==================== -->
       <div class="card">
-               
         <h3>Gráficos e Histórico de Acompanhamento</h3>
-               
         <div class="grafico-container">
-                   
-          <canvas id="grafico-evolucao" style="max-height: 400px"></canvas>    
-             
+          <canvas id="grafico-evolucao" style="max-height: 400px"></canvas>
         </div>
-               
         <h4 style="margin-top: 20px; color: var(--primary-color)">
-                    Histórico Detalhado        
+          Histórico Detalhado
         </h4>
-               
         <table id="tabela-historico">
-                   
           <thead>
-                       
             <tr>
-                           
               <th>Data</th>
-                           
               <th>Peso (Kg)</th>
-                           
               <th>% Gordura</th>
-                           
               <th>Observações</th>
               <th>Ação</th>
-                         
             </tr>
-                     
           </thead>
-                   
           <tbody></tbody>
-                 
         </table>
-             
       </div>
-         
     </main>
 
-       
     <script>
       const API_URL = "https://app-jorlan.onrender.com/api/alunos";
       const alunoId = new URLSearchParams(window.location.search).get("id");
@@ -160,19 +141,16 @@
       let chartInstance = null;
 
       const formatarData = (isoString) =>
-        new Date(isoString).toLocaleDateString("pt-BR"); // ✅ FUNÇÃO DE DELEÇÃO (Globalizada)
+        new Date(isoString).toLocaleDateString("pt-BR");
 
       async function deletarRegistro(evolucaoId) {
         if (
           !confirm("Tem certeza que deseja deletar este registro de evolução?")
         )
           return;
-
         try {
-          // Rota DELETE: /api/alunos/evolucao/[ID]
           const deleteUrl = `${API_URL}/evolucao/${evolucaoId}`;
           const response = await fetch(deleteUrl, { method: "DELETE" });
-
           if (response.ok) {
             alert("Registro deletado com sucesso!");
             carregarDados();
@@ -184,7 +162,7 @@
           alert("Erro de conexão ao deletar registro.");
         }
       }
-      window.deletarRegistro = deletarRegistro; // Torna a função global
+      window.deletarRegistro = deletarRegistro;
 
       async function carregarDados() {
         if (!alunoId) return;
@@ -198,7 +176,6 @@
           ).textContent = `Acompanhamento de ${alunoData.nome}`;
           document.getElementById("aluno-nome-header").textContent =
             alunoData.nome;
-
           document.getElementById("edit-nome").value = alunoData.nome || "";
           document.getElementById("edit-email").value = alunoData.email || "";
           document.getElementById("edit-alturaCm").value =
@@ -206,7 +183,7 @@
           document.getElementById("edit-objetivo").value =
             alunoData.objetivo || "";
           document.getElementById("edit-treinoHtml").value =
-            alunoData.treinoHtml || ""; // Preenche Treino
+            alunoData.treinoHtml || "";
 
           document.getElementById(
             "btn-download-pdf"
@@ -214,6 +191,7 @@
 
           renderizarTabela(alunoData.evolucao);
           renderizarGrafico(alunoData.evolucao);
+          renderizarTreino(alunoData.treinoHtml);
         } catch (error) {
           document.getElementById(
             "aluno-nome-header"
@@ -221,8 +199,57 @@
         }
       }
 
+      // ==================== VISUALIZAÇÃO E PDF DO TREINO ====================
+      function renderizarTreino(treinoHtml) {
+        const container = document.getElementById("treino-estruturado");
+        container.innerHTML = "";
+
+        if (!treinoHtml) {
+          container.innerHTML =
+            "<p style='color:gray'>Nenhum treino cadastrado ainda.</p>";
+          return;
+        }
+
+        // Quebra o texto por "Treino A:", "Treino B:", etc.
+        const blocos = treinoHtml
+          .split(/Treino\s([A-Z]):/)
+          .filter((b) => b.trim() !== "");
+        for (let i = 0; i < blocos.length; i += 2) {
+          const nome = blocos[i];
+          const conteudo = blocos[i + 1] ? blocos[i + 1].trim() : "";
+          const div = document.createElement("div");
+          div.style.marginBottom = "15px";
+          div.innerHTML = `
+          <h4 style="color:#007bff">Treino ${nome}</h4>
+          <pre style="background:#fff; padding:10px; border-radius:6px; white-space:pre-wrap;">${conteudo}</pre>
+        `;
+          container.appendChild(div);
+        }
+      }
+
+      document
+        .getElementById("btn-pdf-treino")
+        .addEventListener("click", () => {
+          if (!alunoData?.treinoHtml) {
+            alert("Nenhum treino disponível para exportar.");
+            return;
+          }
+
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF();
+          doc.setFontSize(16);
+          doc.text(`Ficha de Treino - ${alunoData.nome}`, 10, 15);
+          doc.setFontSize(12);
+          const treinoFormatado = alunoData.treinoHtml.replace(
+            /Treino/g,
+            "\nTreino"
+          );
+          doc.text(treinoFormatado, 10, 30);
+          doc.save(`Treino_${alunoData.nome.replace(/\s+/g, "_")}.pdf`);
+        });
+
+      // ==================== GRÁFICO ====================
       function renderizarGrafico(evolucao) {
-        // ... (lógica de gráfico) ...
         if (chartInstance) chartInstance.destroy();
         const datas = evolucao.map((e) => formatarData(e.dataRegistro));
         const pesos = evolucao.map((e) => e.pesoKg);
@@ -243,7 +270,6 @@
                 tension: 0.3,
                 fill: false,
                 pointRadius: 6,
-                pointHoverRadius: 8,
               },
               {
                 label: "% Gordura",
@@ -260,26 +286,26 @@
         });
       }
 
+      // ==================== HISTÓRICO ====================
       function renderizarTabela(evolucao) {
-        const tbody = document
-          .getElementById("tabela-historico")
-          .querySelector("tbody");
+        const tbody = document.querySelector("#tabela-historico tbody");
         tbody.innerHTML = "";
         evolucao.reverse().forEach((e) => {
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td>${formatarData(e.dataRegistro)}</td>
-            <td>${e.pesoKg.toFixed(1)} Kg</td>
-            <td>${e.percGordura ? e.percGordura.toFixed(1) + "%" : "-"}</td>
-            <td>${e.observacoes || "-"}</td>
-                         <td><button onclick="deletarRegistro('${
+          <td>${formatarData(e.dataRegistro)}</td>
+          <td>${e.pesoKg.toFixed(1)} Kg</td>
+          <td>${e.percGordura ? e.percGordura.toFixed(1) + "%" : "-"}</td>
+          <td>${e.observacoes || "-"}</td>
+          <td><button onclick="deletarRegistro('${
             e.id
-          }')" style="padding: 5px 10px; background-color: #ff0000; color: white; border-radius: 4px; border: none; cursor: pointer;">X</button></td>
-          `;
+          }')" style="padding:5px 10px; background-color:#ff0000; color:white; border-radius:4px; border:none; cursor:pointer;">X</button></td>
+        `;
           tbody.appendChild(tr);
         });
-      } // Atualização do aluno (PUT)
+      }
 
+      // ==================== PUT E POST ====================
       document
         .getElementById("form-edicao")
         .addEventListener("submit", async (e) => {
@@ -311,7 +337,7 @@
             msg.textContent = "Erro de conexão (PUT).";
             msg.style.color = "red";
           }
-        }); // Novo registro de evolução (POST)
+        });
 
       document
         .getElementById("form-evolucao")
@@ -347,6 +373,6 @@
 
       carregarDados();
     </script>
-           
+    <script src="script.js"></script>
   </body>
 </html>
