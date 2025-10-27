@@ -1,31 +1,22 @@
 /* public/css/main.css - Estética Fitness Laranja e Preto (Mobile-First) */
 :root {
-  /* Cores Unificadas */
-  --primary-color: #ff6600; /* Laranja Vibrante (Destaque/Motivação) */
-  --secondary-color: #1a1a1a; /* Preto Profundo (Fundo Dark) */
-  --text-color: #e0e0e0; /* Texto Principal Claro */
-  --background-main: #121212; /* Fundo Escuro Principal */
-  --background-card: #1e1e1e; /* Fundo de Card Um Pouco Mais Claro */
-  --accent-light: #2c2c2c; /* Fundo de Linhas/Headers de Tabela */
+  --primary-color: #ff6600;
+  --secondary-color: #1a1a1a;
+  --text-color: #e0e0e0;
+  --background-main: #121212;
+  --background-card: #1e1e1e;
+  --accent-light: #2c2c2c;
   --white: #ffffff;
-
-  /* Variáveis Duplicadas Removidas para consistência: */
-  /* --color-dark, --color-light, --color-highlight, etc. */
 }
 
-/* ------------------------------------ */
-/* BASE E TYPOGRAPHY */
-/* ------------------------------------ */
-
+/* BASE */
 body {
   font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--background-main);
   color: var(--text-color);
   margin: 0;
   padding: 0;
-
-  /* Configuração de Fundo da Imagem */
-  background-image: url(/frontend/imagem/f.s.jorlan.jpg);
+  background-image: url(../imagem/f.s.jorlan.jpg);
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -43,7 +34,7 @@ header {
 header h1 {
   margin: 0;
   color: var(--primary-color);
-  font-size: 1.8em; /* Ajuste para mobile */
+  font-size: 1.8em;
   letter-spacing: 1px;
 }
 
@@ -53,7 +44,7 @@ nav a {
   padding: 0 15px;
   font-weight: 600;
   transition: color 0.3s;
-  font-size: 0.9em; /* Ajuste para mobile */
+  font-size: 0.9em;
 }
 
 nav a:hover {
@@ -63,7 +54,7 @@ nav a:hover {
 main {
   max-width: 1200px;
   margin: 30px auto;
-  padding: 0 15px; /* Padding ajustado para mobile */
+  padding: 0 15px;
 }
 
 h2 {
@@ -71,26 +62,24 @@ h2 {
   border-bottom: 2px solid var(--primary-color);
   padding-bottom: 8px;
   margin-top: 30px;
-  font-size: 1.6em; /* Ajuste para mobile */
+  font-size: 1.6em;
 }
 
 .card {
   background-color: var(--background-card);
-  padding: 20px; /* Padding reduzido para mobile */
+  padding: 20px;
   border-radius: 12px;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
   border: 1px solid var(--accent-light);
   margin-bottom: 20px;
 }
 
-/* ------------------------------------ */
-/* INPUTS & FORMS */
-/* ------------------------------------ */
+/* INPUTS */
 input[type="text"],
 input[type="email"],
 input[type="number"],
 textarea {
-  width: 100%; /* Fixado em 100% para evitar rolagem horizontal */
+  width: 100%;
   padding: 12px;
   margin: 8px 0 15px 0;
   border: 1px solid var(--accent-light);
@@ -107,14 +96,12 @@ textarea:focus {
   outline: none;
 }
 
-/* ------------------------------------ */
-/* BOTÕES (AÇÕES) */
-/* ------------------------------------ */
+/* BOTÕES */
 button,
 .btn-acao {
   background-color: var(--primary-color);
   color: var(--secondary-color);
-  padding: 12px 20px; /* Padding mais compacto */
+  padding: 12px 20px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -122,10 +109,9 @@ button,
   display: inline-block;
   font-weight: 700;
   text-transform: uppercase;
-  font-size: 0.9em; /* Ajuste para mobile */
+  font-size: 0.9em;
   letter-spacing: 0.5px;
   transition: background-color 0.2s, transform 0.1s;
-  /* Adicionado margin-right zero para quebrar linha em mobile */
   margin-right: 5px;
 }
 
@@ -135,7 +121,6 @@ button:hover,
   transform: translateY(-1px);
 }
 
-/* Quebra de linha forçada para botões em mobile */
 @media (max-width: 600px) {
   button,
   .btn-acao {
@@ -146,20 +131,17 @@ button:hover,
   }
 }
 
-/* ------------------------------------ */
-/* TABELAS (CRÍTICO PARA MOBILE) */
-/* ------------------------------------ */
+/* TABELAS */
 table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   border-radius: 8px;
-  overflow-x: auto; /* Permite rolagem horizontal APENAS se a tabela for muito larga */
-  -webkit-overflow-scrolling: touch; /* Melhora a rolagem em iOS */
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   margin-top: 25px;
 }
 
-/* Wrapper para garantir que a tabela seja responsiva */
 .table-responsive-wrapper {
   overflow-x: auto;
   width: 100%;
@@ -170,14 +152,14 @@ th {
   color: var(--primary-color);
   padding: 15px 12px;
   text-transform: uppercase;
-  font-size: 0.85em; /* Reduz o tamanho da fonte */
+  font-size: 0.85em;
 }
 
 td {
   background-color: var(--background-card);
   border-bottom: 1px solid var(--accent-light);
   color: var(--text-color);
-  padding: 12px; /* Padding reduzido */
+  padding: 12px;
   font-size: 0.9em;
 }
 
@@ -185,17 +167,43 @@ tr:last-child td {
   border-bottom: none;
 }
 
-/* Opcional: Estilo específico para o botão X na tabela */
 td button {
   background-color: #ff0000;
   padding: 5px 10px;
   font-size: 0.8em;
   height: auto;
   width: auto;
-  display: inline-block; /* Sobrescreve a regra display:block do media query */
+  display: inline-block;
 }
 
-/* Ajuste do Header (Treino) */
+/* ABAS */
 h4 {
   font-size: 1.1em;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.tab-button {
+  background-color: #f4f4f4;
+  border: 1px solid #ccc;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 6px 6px 0 0;
+  margin-right: 5px;
+  transition: background-color 0.2s ease;
+}
+
+.tab-button.active {
+  background-color: #007bff;
+  color: white;
+  border-bottom: none;
+}
+.add-exercicio-btn {
+  margin-bottom: 15px;
 }
