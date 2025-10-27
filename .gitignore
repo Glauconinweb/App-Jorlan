@@ -1,0 +1,55 @@
+# ------------------------------------
+# DEPENDÊNCIAS
+# ------------------------------------
+# Node modules: Contém todas as bibliotecas instaladas (MUITO GRANDE)
+node_modules
+/package-lock.json
+/npm-debug.log
+/yarn-error.log
+/package.json
+
+# ------------------------------------
+# ARQUIVOS DE AMBIENTE E SENHAS
+# ------------------------------------
+# Contém a string de conexão do MongoDB, que NUNCA deve ser pública
+.env
+.env.local 
+.env.development
+.env.production
+
+# ------------------------------------
+# ARQUIVOS GERADOS PELO PRISMA
+# ------------------------------------
+# O cliente Prisma gerado. O Render/servidor pode gerá-lo se necessário.
+# Mas o padrão é manter o cliente gerado fora do repositório
+/node_modules/.prisma
+/prisma/migrations
+
+# ------------------------------------
+# ARQUIVOS GRANDES E BINÁRIOS (PUPPETEER)
+# ------------------------------------
+# O Puppeteer baixa uma cópia completa do Chromium (que é ENORME e problemático no deploy)
+# É melhor que o Render baixe o Chrome/Chromium necessário durante a instalação.
+# O Puppeteer armazena binários em diferentes locais dependendo do OS.
+.cache
+.npm/_chromium
+
+# ------------------------------------
+# REGISTROS DE ERRO E DEPURADORES
+# ------------------------------------
+# Arquivos de log gerados pelo Node
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+/logs
+*.log
+
+# ------------------------------------
+# AMBIENTE DE DESENVOLVIMENTO
+# ------------------------------------
+# Arquivos de configuração do Visual Studio Code
+.vscode/
+
+# Arquivos temporários
+*.tmp
+*.bak

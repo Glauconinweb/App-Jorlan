@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title id="aluno-titulo">Acompanhamento do Aluno</title>
+    <link rel="stylesheet" href="/frontend/public/css/main.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>Treinador Pro</h1>
+      <nav>
+        <a href="/">Dashboard</a>
+        <a href="/views/cadastro.html">Novo Aluno</a>
+      </nav>
+    </header>
+    <main>
+      <h2 id="aluno-nome-header">Detalhes do Aluno</h2>
+
+      <div class="card">
+        <h3>Ficha do Aluno</h3>
+        <form id="form-edicao">
+          <input
+            type="text"
+            id="edit-nome"
+            placeholder="Nome Completo"
+            required
+          />
+          <input type="email" id="edit-email" placeholder="Email" />
+          <input type="number" id="edit-alturaCm" placeholder="Altura (cm)" />
+          <input type="text" id="edit-objetivo" placeholder="Objetivo" />
+          <button type="submit">Salvar Ficha (Atualizar Dados)</button>
+          <p id="msg-edicao" style="margin-top: 10px"></p>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>Registrar Nova Evolução (Planilha de Entrada)</h3>
+        <form id="form-evolucao">
+          <input
+            type="number"
+            step="0.1"
+            id="peso"
+            placeholder="Peso (Kg)"
+            required
+          />
+          <input
+            type="number"
+            step="0.1"
+            id="gordura"
+            placeholder="% Gordura (Opcional)"
+          />
+          <textarea id="observacoes" placeholder="Observações"></textarea>
+          <button type="submit">Adicionar Registro</button>
+          <a
+            href="#"
+            id="btn-download-pdf"
+            class="btn-acao"
+            target="_blank"
+            style="margin-left: 10px"
+            >Baixar Relatório PDF</a
+          >
+        </form>
+        <p id="msg-evolucao"></p>
+      </div>
+
+      <div class="card">
+        <h3>Gráficos e Histórico de Acompanhamento</h3>
+        <div class="grafico-container">
+          <canvas id="grafico-evolucao" style="max-height: 400px"></canvas>
+        </div>
+        <h4 style="margin-top: 20px; color: var(--primary-color)">
+          Histórico Detalhado
+        </h4>
+        <table id="tabela-historico">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Peso (Kg)</th>
+              <th>% Gordura</th>
+              <th>Observações</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </main>
+
+    <script>
+      const API_BASE_URL = window.location.origin;
+      const API_URL = `${API_BASE_URL}/api/alunos`;
+      const alunoId = new URLSearchParams(window.location.search).get("id");
+      let alunoData = null;
+      let chartInstance = null;
+
+      const formatarData = (isoString) =>
+        new Date(isoString).toLocaleDateString("pt-BR");
+
+      async function carregarDados() {
+        if (!alunoId) return;
+        try {
+          // ✅ GET: Carrega detalhes do aluno
+          const response = await fetch(`${API_URL}/${alunoId}`);
+          alunoData = await response.json();
+          if (alunoData.error) throw new Error(alunoData.error);
+
+          document.getElementById(
+            "aluno-titulo"
+          ).textContent = `Acompanhamento de ${alunoData.nome}`;
+          document.getElementById("aluno-nome-header").textContent =
+            alunoData.nome;
+
+          // Preenche formulário de Edição
+          document.getElementById("edit-nome").value = alunoData.nome || "";
+          document.getElementById("edit-email").value = alunoData.email || "";
+          document.getElementById("edit-alturaCm").value =
+            alunoData.alturaCm || "";
+          document.getElementById("edit-objetivo").value =
+            alunoData.objetivo || "";
+
+          // Configura o link de download (MÉTODO GET)
+          document.getElementById(
+            "btn-download-pdf"
+          ).href = `${API_URL}/pdf/download/${alunoId}`;
+
+          renderizarTabela(alunoData.evolucao);
+          renderizarGrafico(alunoData.evolucao);
+        } catch (error) {
+          document.getElementById(
+            "aluno-nome-header"
+          ).textContent = `Erro ao carregar dados: ${error.message}`;
+        }
+      }
+
+      function renderizarGrafico(evolucao) {
+        if (chartInstance) chartInstance.destroy();
+
+        const datas = evolucao.map((e) => formatarData(e.dataRegistro));
+        const pesos = evolucao.map((e) => e.pesoKg);
+        const gordura = evolucao.map((e) => e.percGordura);
+
+        const ctx = document
+          .getElementById("grafico-evolucao")
+          .getContext("2d");
+        chartInstance = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: datas,
+            datasets: [
+              {
+                label: "Peso (Kg)",
+                data: pesos,
+                borderColor: "rgb(75, 192, 192)",
+                tension: 0.3,
+                fill: false,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+              },
+              {
+                label: "% Gordura",
+                data: gordura,
+                borderColor: "rgb(255, 99, 132)",
+                tension: 0.3,
+                hidden: true,
+                fill: false,
+                borderDash: [5, 5],
+              },
+            ],
+          },
+          options: { responsive: true },
+        });
+      }
+
+      function renderizarTabela(evolucao) {
+        const tbody = document
+          .getElementById("tabela-historico")
+          .querySelector("tbody");
+        tbody.innerHTML = "";
+        evolucao.reverse().forEach((e) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+                    <td>${formatarData(e.dataRegistro)}</td>
+                    <td>${e.pesoKg.toFixed(1)} Kg</td>
+                    <td>${
+                      e.percGordura ? e.percGordura.toFixed(1) + "%" : "-"
+                    }</td>
+                    <td>${e.observacoes || "-"}</td>
+                `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // Lógica de Atualização Cadastral (PUT)
+      document
+        .getElementById("form-edicao")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const msg = document.getElementById("msg-edicao");
+          const dados = {
+            nome: document.getElementById("edit-nome").value,
+            email: document.getElementById("edit-email").value,
+            alturaCm: document.getElementById("edit-alturaCm").value,
+            objetivo: document.getElementById("edit-objetivo").value,
+          };
+
+          try {
+            // ✅ PUT: Atualiza ficha do aluno
+            const response = await fetch(`${API_URL}/${alunoId}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(dados),
+            });
+
+            if (response.ok) {
+              msg.textContent = "Ficha salva com sucesso!";
+              msg.style.color = "green";
+              carregarDados();
+            } else {
+              msg.textContent = `Falha ao salvar ficha. Erro: ${response.status}`;
+              msg.style.color = "red";
+            }
+          } catch (error) {
+            msg.textContent = "Erro de conexão (PUT).";
+            msg.style.color = "red";
+          }
+        });
+
+      // Lógica de Novo Registro de Evolução (POST)
+      document
+        .getElementById("form-evolucao")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const msg = document.getElementById("msg-evolucao");
+          const dados = {
+            pesoKg: document.getElementById("peso").value,
+            percGordura: document.getElementById("gordura").value,
+            observacoes: document.getElementById("observacoes").value,
+          };
+
+          try {
+            // ✅ POST: Adiciona novo registro de evolução
+            const response = await fetch(`${API_URL}/${alunoId}/evolucao`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(dados),
+            });
+
+            if (response.ok) {
+              msg.textContent = "Registro de evolução adicionado com sucesso!";
+              msg.style.color = "green";
+              document.getElementById("form-evolucao").reset();
+              carregarDados();
+            } else {
+              msg.textContent = `Erro ao registrar evolução. Erro: ${response.status}`;
+              msg.style.color = "red";
+            }
+          } catch (error) {
+            msg.textContent = "Erro de conexão (POST).";
+            msg.style.color = "red";
+          }
+        });
+
+      carregarDados();
+    </script>
+  </body>
+</html>

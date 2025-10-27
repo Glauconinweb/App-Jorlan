@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Relatório de Evolução</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #e8f4f8; /* Fundo Leve AZUL (Claro e profissional) */
+        color: #2c3e50;
+      }
+
+      /* CSS CRUCIAL: Força a impressão do fundo (Compatibilidade Puppeteer) */
+      * {
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+
+      .header-pdf {
+        background-color: #3498db; /* Cor de Destaque */
+        color: white;
+        padding: 25px;
+        text-align: center;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .ficha {
+        background-color: white;
+        padding: 20px;
+        border: 1px solid #bdc3c7;
+        border-radius: 6px;
+        margin-bottom: 25px;
+        page-break-inside: avoid;
+      }
+      .ficha p {
+        margin: 5px 0;
+      }
+      .ficha strong {
+        color: #34495e;
+        display: inline-block;
+        width: 100px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        page-break-inside: avoid;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 12px 15px;
+        text-align: left;
+      }
+      th {
+        background-color: #f0f4f7;
+        color: #3498db;
+      }
+      tr:nth-child(even) {
+        background-color: #f9f9fa;
+      }
+
+      h2 {
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 5px;
+        color: #2c3e50;
+      }
+
+      /* Rodapé opcional para o PDF */
+      @page {
+        @bottom-right {
+          content: "Página " counter(page) " de " counter(pages);
+          font-size: 10pt;
+          color: #7f8c8d;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header-pdf">
+      <h1>Relatório de Evolução Pessoal</h1>
+    </div>
+
+    <div class="ficha">
+      <h2>Dados Cadastrais</h2>
+      <p><strong>Nome:</strong> {{ALUNO_NOME}}</p>
+      <p><strong>Email:</strong> {{ALUNO_EMAIL}}</p>
+      <p><strong>Altura:</strong> {{ALUNO_ALTURA}}</p>
+      <p><strong>Objetivo:</strong> {{ALUNO_OBJETIVO}}</p>
+    </div>
+
+    <div class="ficha">
+      <h2>Histórico de Acompanhamento (Planilha)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Peso</th>
+            <th>% Gordura</th>
+            <th>Observações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{EVOLUCAO_LINHAS}}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>
