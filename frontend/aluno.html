@@ -1,44 +1,80 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+   
   <head>
+       
     <meta charset="UTF-8" />
+       
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+       
     <title id="aluno-titulo">Acompanhamento do Aluno</title>
-    <!-- Caminho relativo para CSS -->
+       
     <link rel="stylesheet" href="/css/main.css" />
+       
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+     
   </head>
+   
   <body>
+       
     <header>
+           
       <h1>Treinador Pro</h1>
+           
       <nav>
-        <a href="index.html">Dashboard</a>
-        <a href="cadastro.html">Novo Aluno</a>
+                <a href="index.html">Dashboard</a>        
+        <a href="cadastro.html">Novo Aluno</a>      
       </nav>
+         
     </header>
+       
     <main>
+           
       <h2 id="aluno-nome-header">Detalhes do Aluno</h2>
 
+           
       <div class="card">
-        <h3>Ficha do Aluno</h3>
+               
+        <h3>Ficha e Treino (Editar)</h3>
+               
         <form id="form-edicao">
+                   
           <input
             type="text"
             id="edit-nome"
             placeholder="Nome Completo"
             required
           />
-          <input type="email" id="edit-email" placeholder="Email" />
-          <input type="number" id="edit-alturaCm" placeholder="Altura (cm)" />
+                    <input type="email" id="edit-email" placeholder="Email" />  
+                 
+          <input type="number" id="edit-alturaCm" placeholder="Altura (cm)" />  
+                 
           <input type="text" id="edit-objetivo" placeholder="Objetivo" />
-          <button type="submit">Salvar Ficha (Atualizar Dados)</button>
+
+          <h4 style="color: var(--primary-color); margin-top: 20px">
+            Detalhes do Treino (HTML Simples)
+          </h4>
+          <textarea
+            id="edit-treinoHtml"
+            placeholder="Digite aqui a estrutura do Treino A, Treino B, Treino C, usando quebras de linha. Este conteúdo irá diretamente para o PDF."
+            rows="8"
+          ></textarea>
+
+                    <button type="submit">Salvar Ficha e Treino</button>        
+           
           <p id="msg-edicao" style="margin-top: 10px"></p>
+                 
         </form>
+             
       </div>
 
+           
       <div class="card">
+               
         <h3>Registrar Nova Evolução (Planilha de Entrada)</h3>
+               
         <form id="form-evolucao">
+                   
           <input
             type="number"
             step="0.1"
@@ -46,14 +82,16 @@
             placeholder="Peso (Kg)"
             required
           />
+                   
           <input
             type="number"
             step="0.1"
             id="gordura"
             placeholder="% Gordura (Opcional)"
           />
-          <textarea id="observacoes" placeholder="Observações"></textarea>
-          <button type="submit">Adicionar Registro</button>
+                   
+          <textarea id="observacoes" placeholder="Observações"></textarea>      
+              <button type="submit">Adicionar Registro</button>          
           <a
             href="#"
             id="btn-download-pdf"
@@ -61,36 +99,58 @@
             target="_blank"
             style="margin-left: 10px"
           >
-            Baixar Relatório PDF
+                        Baixar Relatório PDF          
           </a>
+                 
         </form>
+               
         <p id="msg-evolucao"></p>
+             
       </div>
 
+           
       <div class="card">
+               
         <h3>Gráficos e Histórico de Acompanhamento</h3>
+               
         <div class="grafico-container">
-          <canvas id="grafico-evolucao" style="max-height: 400px"></canvas>
+                   
+          <canvas id="grafico-evolucao" style="max-height: 400px"></canvas>    
+             
         </div>
+               
         <h4 style="margin-top: 20px; color: var(--primary-color)">
-          Histórico Detalhado
+                    Histórico Detalhado        
         </h4>
+               
         <table id="tabela-historico">
+                   
           <thead>
+                       
             <tr>
+                           
               <th>Data</th>
+                           
               <th>Peso (Kg)</th>
+                           
               <th>% Gordura</th>
+                           
               <th>Observações</th>
+                         
             </tr>
+                     
           </thead>
+                   
           <tbody></tbody>
+                 
         </table>
+             
       </div>
+         
     </main>
 
+       
     <script>
-      // URL do backend no Render
       const API_URL = "https://app-jorlan.onrender.com/api/alunos";
       const alunoId = new URLSearchParams(window.location.search).get("id");
       let alunoData = null;
@@ -110,17 +170,18 @@
             "aluno-titulo"
           ).textContent = `Acompanhamento de ${alunoData.nome}`;
           document.getElementById("aluno-nome-header").textContent =
-            alunoData.nome;
+            alunoData.nome; // Preenche formulário de Edição
 
-          // Preenche formulário de Edição
           document.getElementById("edit-nome").value = alunoData.nome || "";
           document.getElementById("edit-email").value = alunoData.email || "";
           document.getElementById("edit-alturaCm").value =
             alunoData.alturaCm || "";
           document.getElementById("edit-objetivo").value =
             alunoData.objetivo || "";
+          // ✅ NOVO: Preenche o campo de Treino com o HTML salvo
+          document.getElementById("edit-treinoHtml").value =
+            alunoData.treinoHtml || ""; // Configura link de download PDF
 
-          // Configura link de download PDF
           document.getElementById(
             "btn-download-pdf"
           ).href = `${API_URL}/pdf/download/${alunoId}`;
@@ -180,16 +241,15 @@
         evolucao.reverse().forEach((e) => {
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td>${formatarData(e.dataRegistro)}</td>
-            <td>${e.pesoKg.toFixed(1)} Kg</td>
-            <td>${e.percGordura ? e.percGordura.toFixed(1) + "%" : "-"}</td>
-            <td>${e.observacoes || "-"}</td>
-          `;
+            <td>${formatarData(e.dataRegistro)}</td>
+            <td>${e.pesoKg.toFixed(1)} Kg</td>
+            <td>${e.percGordura ? e.percGordura.toFixed(1) + "%" : "-"}</td>
+            <td>${e.observacoes || "-"}</td>
+          `;
           tbody.appendChild(tr);
         });
-      }
+      } // Atualização do aluno (PUT)
 
-      // Atualização do aluno (PUT)
       document
         .getElementById("form-edicao")
         .addEventListener("submit", async (e) => {
@@ -200,6 +260,8 @@
             email: document.getElementById("edit-email").value,
             alturaCm: document.getElementById("edit-alturaCm").value,
             objetivo: document.getElementById("edit-objetivo").value,
+            // ✅ NOVO: Puxa o conteúdo do Treino para o PUT
+            treinoHtml: document.getElementById("edit-treinoHtml").value,
           };
 
           try {
@@ -209,7 +271,7 @@
               body: JSON.stringify(dados),
             });
             if (response.ok) {
-              msg.textContent = "Ficha salva com sucesso!";
+              msg.textContent = "Ficha e Treino salvos com sucesso!";
               msg.style.color = "green";
               carregarDados();
             } else {
@@ -220,9 +282,8 @@
             msg.textContent = "Erro de conexão (PUT).";
             msg.style.color = "red";
           }
-        });
+        }); // Novo registro de evolução (POST)
 
-      // Novo registro de evolução (POST)
       document
         .getElementById("form-evolucao")
         .addEventListener("submit", async (e) => {
@@ -257,5 +318,6 @@
 
       carregarDados();
     </script>
+     
   </body>
 </html>

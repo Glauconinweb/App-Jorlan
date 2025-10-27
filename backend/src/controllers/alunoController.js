@@ -12,17 +12,19 @@ const normalizeOptionalString = (value) =>
 
 // Criar aluno
 exports.criarAluno = async (req, res) => {
-  const { nome, email, alturaCm, objetivo } = req.body;
+  // 🚨 NOVO CAMPO ADICIONADO AQUI
+  const { nome, email, alturaCm, objetivo, treinoHtml } = req.body;
   if (!nome) return res.status(400).json({ error: "O nome é obrigatório." });
 
   try {
     const novoAluno = await prisma.aluno.create({
       data: {
         nome,
-        // ✅ PRATICIDADE: Garante que "" (string vazia) se torne NULL
         email: normalizeOptionalString(email),
         alturaCm: alturaCm ? parseInt(alturaCm) : null,
-        objetivo: normalizeOptionalString(objetivo), // Aplicado também ao objetivo
+        objetivo: normalizeOptionalString(objetivo),
+        // ✅ NOVO: Salva o campo de treino
+        treinoHtml: normalizeOptionalString(treinoHtml),
       },
     });
     res.status(201).json(novoAluno);
@@ -33,7 +35,7 @@ exports.criarAluno = async (req, res) => {
   }
 };
 
-// Listar alunos
+// Listar alunos (sem mudanças)
 exports.listarAlunos = async (req, res) => {
   try {
     const alunos = await prisma.aluno.findMany({
@@ -47,7 +49,7 @@ exports.listarAlunos = async (req, res) => {
   }
 };
 
-// Detalhes de um aluno
+// Detalhes de um aluno (sem mudanças, o treino virá automaticamente)
 exports.detalhesAluno = async (req, res) => {
   try {
     const aluno = await prisma.aluno.findUnique({
@@ -65,16 +67,18 @@ exports.detalhesAluno = async (req, res) => {
 
 // Atualizar aluno
 exports.atualizarAluno = async (req, res) => {
-  const { nome, email, alturaCm, objetivo } = req.body;
+  // 🚨 NOVO CAMPO ADICIONADO AQUI
+  const { nome, email, alturaCm, objetivo, treinoHtml } = req.body;
   try {
     const alunoAtualizado = await prisma.aluno.update({
       where: { id: req.params.id },
       data: {
         nome,
-        // ✅ PRATICIDADE: Garante que "" (string vazia) se torne NULL
         email: normalizeOptionalString(email),
         alturaCm: alturaCm ? parseInt(alturaCm) : null,
-        objetivo: normalizeOptionalString(objetivo), // Aplicado também ao objetivo
+        objetivo: normalizeOptionalString(objetivo),
+        // ✅ NOVO: Atualiza o campo de treino
+        treinoHtml: normalizeOptionalString(treinoHtml),
       },
     });
     res.status(200).json(alunoAtualizado);
@@ -85,7 +89,7 @@ exports.atualizarAluno = async (req, res) => {
   }
 };
 
-// Adicionar evolução
+// Adicionar evolução (sem mudanças)
 exports.adicionarEvolucao = async (req, res) => {
   const { alunoId } = req.params;
   const { pesoKg, percGordura, observacoes } = req.body;
@@ -96,7 +100,6 @@ exports.adicionarEvolucao = async (req, res) => {
         alunoId: alunoId,
         pesoKg: parseFloat(pesoKg),
         percGordura: percGordura ? parseFloat(percGordura) : null,
-        // Garante que observações vazias sejam NULL
         observacoes: normalizeOptionalString(observacoes),
         dataRegistro: new Date(),
       },
@@ -123,10 +126,13 @@ exports.gerarDownloadPDF = async (req, res) => {
     let htmlTemplate = await fs.readFile(
       path.join(__dirname, "../../public/views/planilha_pdf_template.html"),
       "utf-8"
-    );
+    ); // 1. TRATAMENTO DO CONTEÚDO HTML DO TREINO
 
-    // Substituir placeholders
-    // Os campos do aluno podem ser null, então o || "" garante que não quebre a substituição
+    // Se o campo treinoHtml for nulo ou vazio, injeta uma mensagem amigável no template.
+    const treinoContent = aluno.treinoHtml
+      ? aluno.treinoHtml
+      : '<div class="bloco-treino" style="border-left: 5px solid #ff0000;"><h3>Nenhum Treino Cadastrado</h3><p>Use a tela de acompanhamento para adicionar o treino A, B, C, etc., em HTML.</p></div>'; // 2. SUBSTITUIÇÃO DE PLACEHOLDERS (incluindo o novo treino)
+
     htmlTemplate = htmlTemplate
       .replace("{{ALUNO_NOME}}", aluno.nome)
       .replace("{{ALUNO_EMAIL}}", aluno.email || "Não informado")
@@ -134,27 +140,24 @@ exports.gerarDownloadPDF = async (req, res) => {
         "{{ALUNO_ALTURA}}",
         aluno.alturaCm ? `${aluno.alturaCm} cm` : "Não informado"
       )
-      .replace("{{ALUNO_OBJETIVO}}", aluno.objetivo || "Não informado");
+      .replace("{{ALUNO_OBJETIVO}}", aluno.objetivo || "Não informado")
+      // ✅ NOVO: Injeta o conteúdo HTML do treino
+      .replace("{{TREINO_BLOCO}}", treinoContent);
 
     const linhasEvolucao = aluno.evolucao
       .map(
         (e) => `
-                <tr>
-                    <td>${new Date(e.dataRegistro).toLocaleDateString(
-                      "pt-BR"
-                    )}</td>
-                    <td>${e.pesoKg.toFixed(1)} Kg</td>
-                    <td>${
-                      e.percGordura ? e.percGordura.toFixed(1) + "%" : "-"
-                    }</td>
-                    <td>${e.observacoes || "Sem notas"}</td>
-                </tr>`
+ <tr>
+<td>${new Date(e.dataRegistro).toLocaleDateString("pt-BR")}</td>
+ <td>${e.pesoKg.toFixed(1)} Kg</td>
+<td>${e.percGordura ? e.percGordura.toFixed(1) + "%" : "-"}</td>
+ <td>${e.observacoes || "Sem notas"}</td>
+ </tr>`
       )
       .join("");
 
-    htmlTemplate = htmlTemplate.replace("{{EVOLUCAO_LINHAS}}", linhasEvolucao);
+    htmlTemplate = htmlTemplate.replace("{{EVOLUCAO_LINHAS}}", linhasEvolucao); // Gerar PDF
 
-    // Gerar PDF
     const browser = await puppeteer.launch({
       headless: true,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -162,9 +165,8 @@ exports.gerarDownloadPDF = async (req, res) => {
     const page = await browser.newPage();
     await page.setContent(htmlTemplate, { waitUntil: "networkidle0" });
     const pdfBuffer = await page.pdf({ format: "A4", printBackground: true });
-    await browser.close();
+    await browser.close(); // Download
 
-    // Download
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",

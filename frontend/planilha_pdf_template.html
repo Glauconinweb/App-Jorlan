@@ -3,15 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Relatório de Evolução</title>
-    <link rel="stylesheet" href="/css/main.css" />
+    <title>Relatório de Evolução e Treino</title>
     <style>
+      /* Variáveis de Cores Fitness */
+      :root {
+        --primary-color: #ff6600; /* Laranja Vibrante */
+        --secondary-color: #1a1a1a; /* Preto Profundo */
+        --text-color: #e0e0e0; /* Texto Claro */
+        --background-main: #121212; /* Fundo Escuro */
+        --background-card: #1e1e1e; /* Fundo de Card Escuro */
+        --separator: #333333; /* Linhas de separação */
+        --white: #ffffff;
+      }
+
       body {
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         margin: 0;
-        padding: 20px;
-        background-color: #e8f4f8; /* Fundo Leve AZUL (Claro e profissional) */
-        color: #2c3e50;
+        padding: 30px; /* Mais espaço */
+        background-color: var(--background-card); /* Fundo sutilmente escuro */
+        color: var(--text-color);
       }
 
       /* CSS CRUCIAL: Força a impressão do fundo (Compatibilidade Puppeteer) */
@@ -21,64 +31,104 @@
       }
 
       .header-pdf {
-        background-color: #3498db; /* Cor de Destaque */
-        color: white;
-        padding: 25px;
+        background-color: var(--secondary-color); /* Fundo Preto */
+        color: var(--primary-color);
+        padding: 30px;
         text-align: center;
-        border-radius: 8px;
-        margin-bottom: 25px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        margin-bottom: 30px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        border: 1px solid var(--primary-color);
       }
 
-      .ficha {
-        background-color: white;
+      .header-pdf h1 {
+        margin: 0;
+        font-size: 2.2em;
+        text-transform: uppercase;
+      }
+
+      .secao {
+        background-color: var(--background-card);
         padding: 20px;
-        border: 1px solid #bdc3c7;
-        border-radius: 6px;
+        border: 1px solid var(--separator);
+        border-radius: 8px;
         margin-bottom: 25px;
         page-break-inside: avoid;
       }
-      .ficha p {
-        margin: 5px 0;
-      }
-      .ficha strong {
-        color: #34495e;
-        display: inline-block;
-        width: 100px;
+
+      /* Títulos de Seção */
+      .secao h2 {
+        color: var(--primary-color);
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 8px;
+        margin-top: 0;
+        margin-bottom: 20px;
       }
 
+      .secao p {
+        margin: 8px 0;
+      }
+      .secao strong {
+        color: var(--text-color);
+        display: inline-block;
+        min-width: 120px;
+      }
+
+      /* Tabelas (Histórico) */
       table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 20px;
+        margin-top: 15px;
         page-break-inside: avoid;
+        border-radius: 6px;
+        overflow: hidden;
       }
       th,
       td {
-        border: 1px solid #ddd;
-        padding: 12px 15px;
+        border: 1px solid var(--separator);
+        padding: 14px 10px;
         text-align: left;
       }
       th {
-        background-color: #f0f4f7;
-        color: #3498db;
+        background-color: var(--accent-light);
+        color: var(--primary-color);
+        text-transform: uppercase;
       }
-      tr:nth-child(even) {
-        background-color: #f9f9fa;
+      tr:nth-child(even) td {
+        background-color: #252525; /* Escuro alternado */
+      }
+      tr:nth-child(odd) td {
+        background-color: #1e1e1e;
       }
 
-      h2 {
-        border-bottom: 2px solid #3498db;
+      /* Layout dos Treinos */
+      .treino-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .bloco-treino {
+        background-color: #252525; /* Fundo do bloco */
+        padding: 15px;
+        border-radius: 6px;
+        border-left: 5px solid var(--primary-color); /* Linha Laranja de destaque */
+        page-break-inside: avoid;
+      }
+
+      .bloco-treino h3 {
+        color: var(--white);
+        border-bottom: 1px dashed var(--separator);
         padding-bottom: 5px;
-        color: #2c3e50;
+        margin-top: 0;
       }
 
-      /* Rodapé opcional para o PDF */
+      /* Rodapé de Página */
       @page {
         @bottom-right {
-          content: "Página " counter(page) " de " counter(pages);
+          content: "Página " counter(page) " | Treinador Pro";
           font-size: 10pt;
-          color: #7f8c8d;
+          color: var(--text-color);
         }
       }
     </style>
@@ -88,16 +138,21 @@
       <h1>Relatório de Evolução Pessoal</h1>
     </div>
 
-    <div class="ficha">
-      <h2>Dados Cadastrais</h2>
+    <div class="secao">
+      <h2>Ficha Cadastral</h2>
       <p><strong>Nome:</strong> {{ALUNO_NOME}}</p>
       <p><strong>Email:</strong> {{ALUNO_EMAIL}}</p>
       <p><strong>Altura:</strong> {{ALUNO_ALTURA}}</p>
       <p><strong>Objetivo:</strong> {{ALUNO_OBJETIVO}}</p>
     </div>
 
-    <div class="ficha">
-      <h2>Histórico de Acompanhamento (Planilha)</h2>
+    <div class="secao">
+      <h2>Treinamento Atual</h2>
+      <div class="treino-container">{{TREINO_BLOCO}}</div>
+    </div>
+
+    <div class="secao">
+      <h2>Histórico de Acompanhamento</h2>
       <table>
         <thead>
           <tr>
