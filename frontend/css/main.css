@@ -1,223 +1,59 @@
-/* public/css/main.css - Estética Fitness Laranja e Preto */
+/* public/css/main.css - Estética Fitness Laranja e Preto (Mobile-First) */
 :root {
+  /* Cores Unificadas */
   --primary-color: #ff6600; /* Laranja Vibrante (Destaque/Motivação) */
   --secondary-color: #1a1a1a; /* Preto Profundo (Fundo Dark) */
   --text-color: #e0e0e0; /* Texto Principal Claro */
-  --text-dark: #333333; /* Usado em elementos claros, se necessário */
   --background-main: #121212; /* Fundo Escuro Principal */
   --background-card: #1e1e1e; /* Fundo de Card Um Pouco Mais Claro */
   --accent-light: #2c2c2c; /* Fundo de Linhas/Headers de Tabela */
   --white: #ffffff;
+
+  /* Variáveis Duplicadas Removidas para consistência: */
+  /* --color-dark, --color-light, --color-highlight, etc. */
 }
-:root {
-  --color-dark: #1a1a1a;
-  --color-light: #ffffff;
-  --color-highlight: #ff8c00; /* Laranja */
-  --color-grey-bg: #2b2b2b;
-  --color-border: #444;
-}
+
+/* ------------------------------------ */
+/* BASE E TYPOGRAPHY */
+/* ------------------------------------ */
 
 body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background-color: var(--color-dark); /* Fundo base para áreas sem imagem */
-  color: var(--color-light); /* Cor do texto no modo escuro */
-  margin: 0;
-  padding: 0;
-  background-image: url(/frontend/imagem/f.s.jorlan.jpg);
-  background-size: cover; /* Faz a imagem preencher todo o viewport, cortando se necessário */
-  background-repeat: no-repeat; /* Impede a repetição da imagem */
-  background-attachment: fixed; /* Fixa a imagem no viewport para um efeito paralaxe */
-  background-position: center center; /* Centraliza a imagem */
-}
-
-header {
-  background-color: var(--color-highlight);
-  padding: 20px;
-  text-align: center;
-  color: var(--color-dark);
-  margin-bottom: 20px;
-}
-
-header h1 {
-  margin: 0;
-}
-
-header p {
-  margin-top: 5px;
-}
-
-.container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-h2 {
-  color: var(--color-highlight);
-  border-bottom: 2px solid var(--color-highlight);
-  padding-bottom: 5px;
-  margin-top: 30px;
-}
-
-/* Ficha Info */
-#ficha-info {
-  display: flex;
-  gap: 20px;
-  padding: 15px;
-  background-color: var(--color-grey-bg);
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
-
-#ficha-info label,
-#ficha-info input {
-  color: var(--color-light);
-}
-
-#ficha-info input {
-  flex-grow: 1;
-  padding: 8px;
-  border: none;
-  background-color: #3a3a3a;
-  border-radius: 4px;
-}
-
-/* Abas (Tabs) */
-.tabs {
-  display: flex;
-  margin-bottom: 20px;
-}
-
-.tab-button {
-  background-color: var(--color-grey-bg);
-  color: var(--color-light);
-  border: 1px solid var(--color-border);
-  border-bottom: none;
-  padding: 10px 15px;
-  cursor: pointer;
-  margin-right: 5px;
-  transition: background-color 0.3s;
-}
-
-.tab-button:hover:not(.active) {
-  background-color: #444;
-}
-
-.tab-button.active {
-  background-color: var(--color-highlight);
-  color: var(--color-dark);
-  font-weight: bold;
-}
-
-.tab-content {
-  background-color: var(--color-grey-bg);
-  padding: 20px;
-  border-radius: 0 8px 8px 8px;
-  border: 1px solid var(--color-border);
-  display: none; /* Esconder por padrão */
-}
-
-.tab-content.active {
-  display: block; /* Mostrar o conteúdo ativo */
-}
-
-/* Estilo do Exercício (Formato de Ficha/Card) */
-.exercicio-item {
-  background-color: #3a3a3a;
-  padding: 15px;
-  margin-bottom: 15px;
-  border-radius: 6px;
-  border-left: 5px solid var(--color-highlight); /* Destaque lateral */
-}
-
-.exercicio-item h4 {
-  color: var(--color-highlight);
-  margin-top: 0;
-  border-bottom: 1px solid #444;
-  padding-bottom: 5px;
-  margin-bottom: 10px;
-}
-
-.exercicio-item label {
-  display: block;
-  margin-top: 10px;
-  font-size: 0.9em;
-  color: #ccc;
-}
-
-.exercicio-item input {
-  width: calc(100% - 16px);
-  padding: 8px;
-  margin-top: 5px;
-  box-sizing: border-box;
-  border: none;
-  background-color: #555;
-  color: var(--color-light);
-  border-radius: 3px;
-}
-
-/* Botões de Ação */
-.add-exercicio-btn,
-#gerar-planilha-btn,
-.remover-exercicio-btn {
-  padding: 10px 15px;
-  margin-top: 15px;
-  cursor: pointer;
-  border: none;
-  border-radius: 5px;
-  font-weight: bold;
-}
-
-.add-exercicio-btn {
-  background-color: var(--color-highlight);
-  color: var(--color-dark);
-}
-
-.remover-exercicio-btn {
-  background-color: #d9534f; /* Vermelho */
-  color: var(--color-light);
-  float: right;
-  margin-top: -30px; /* Alinhar com o título do exercício */
-}
-
-#gerar-planilha-btn {
-  display: block;
-  width: 100%;
-  background-color: #007bff; /* Azul para ação final */
-  color: var(--color-light);
-  margin-top: 30px;
-  margin-bottom: 50px;
-}
-body {
-  font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; /* Fonte mais moderna */
-  margin: 0;
-  background-image: url(/frontend/imagem/f.s.jorlan.jpg);
-  padding: 0;
-  background-color: var(--background-main); /* Fundo Dark Mode */
+  font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--background-main);
   color: var(--text-color);
+  margin: 0;
+  padding: 0;
+
+  /* Configuração de Fundo da Imagem */
+  background-image: url(/frontend/imagem/f.s.jorlan.jpg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center center;
 }
 
 header {
   background-color: var(--secondary-color);
   color: var(--white);
-  padding: 25px 0; /* Mais espaçamento */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Sombra mais marcada */
+  padding: 25px 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
   text-align: center;
 }
 
 header h1 {
   margin: 0;
   color: var(--primary-color);
-  font-size: 2.2em;
-  letter-spacing: 1px; /* Estilo motivacional */
+  font-size: 1.8em; /* Ajuste para mobile */
+  letter-spacing: 1px;
 }
 
 nav a {
   color: var(--text-color);
   text-decoration: none;
-  padding: 0 20px;
-  font-weight: 600; /* Mais peso */
+  padding: 0 15px;
+  font-weight: 600;
   transition: color 0.3s;
+  font-size: 0.9em; /* Ajuste para mobile */
 }
 
 nav a:hover {
@@ -226,78 +62,107 @@ nav a:hover {
 
 main {
   max-width: 1200px;
-  margin: 30px auto; /* Mais margem superior */
-  padding: 0 20px;
+  margin: 30px auto;
+  padding: 0 15px; /* Padding ajustado para mobile */
 }
 
 h2 {
   color: var(--primary-color);
   border-bottom: 2px solid var(--primary-color);
   padding-bottom: 8px;
-  margin-top: 40px;
-  font-size: 1.8em;
+  margin-top: 30px;
+  font-size: 1.6em; /* Ajuste para mobile */
 }
 
 .card {
-  background-color: var(--background-card); /* Card escuro */
-  padding: 25px;
-  border-radius: 12px; /* Cantos mais arredondados */
+  background-color: var(--background-card);
+  padding: 20px; /* Padding reduzido para mobile */
+  border-radius: 12px;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-  border: 1px solid var(--accent-light); /* Borda sutil */
+  border: 1px solid var(--accent-light);
+  margin-bottom: 20px;
 }
 
-/* Formulários e Botões */
+/* ------------------------------------ */
+/* INPUTS & FORMS */
+/* ------------------------------------ */
 input[type="text"],
 input[type="email"],
 input[type="number"],
 textarea {
-  width: calc(100% - 22px);
+  width: 100%; /* Fixado em 100% para evitar rolagem horizontal */
   padding: 12px;
   margin: 8px 0 15px 0;
   border: 1px solid var(--accent-light);
-  border-radius: 8px; /* Cantos arredondados nos inputs */
+  border-radius: 8px;
   box-sizing: border-box;
-  background-color: var(--background-main); /* Input dark */
+  background-color: var(--background-main);
   color: var(--text-color);
   font-size: 1em;
 }
 
 input:focus,
 textarea:focus {
-  border-color: var(--primary-color); /* Foco vibrante */
+  border-color: var(--primary-color);
   outline: none;
 }
 
+/* ------------------------------------ */
+/* BOTÕES (AÇÕES) */
+/* ------------------------------------ */
 button,
 .btn-acao {
   background-color: var(--primary-color);
-  color: var(--secondary-color); /* Texto escuro no botão laranja */
-  padding: 12px 25px;
+  color: var(--secondary-color);
+  padding: 12px 20px; /* Padding mais compacto */
   border: none;
   border-radius: 8px;
   cursor: pointer;
   text-decoration: none;
   display: inline-block;
   font-weight: 700;
-  text-transform: uppercase; /* Mais impactante */
+  text-transform: uppercase;
+  font-size: 0.9em; /* Ajuste para mobile */
   letter-spacing: 0.5px;
   transition: background-color 0.2s, transform 0.1s;
+  /* Adicionado margin-right zero para quebrar linha em mobile */
+  margin-right: 5px;
 }
 
 button:hover,
 .btn-acao:hover {
   background-color: #ff8833;
-  transform: translateY(-1px); /* Pequeno efeito 3D */
+  transform: translateY(-1px);
 }
 
-/* Tabelas */
+/* Quebra de linha forçada para botões em mobile */
+@media (max-width: 600px) {
+  button,
+  .btn-acao {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    margin-right: 0;
+  }
+}
+
+/* ------------------------------------ */
+/* TABELAS (CRÍTICO PARA MOBILE) */
+/* ------------------------------------ */
 table {
   width: 100%;
-  border-collapse: separate; /* Permite bordas arredondadas e espaçamento */
+  border-collapse: separate;
   border-spacing: 0;
   border-radius: 8px;
-  overflow: hidden; /* Garante que bordas arredondadas funcionem */
+  overflow-x: auto; /* Permite rolagem horizontal APENAS se a tabela for muito larga */
+  -webkit-overflow-scrolling: touch; /* Melhora a rolagem em iOS */
   margin-top: 25px;
+}
+
+/* Wrapper para garantir que a tabela seja responsiva */
+.table-responsive-wrapper {
+  overflow-x: auto;
+  width: 100%;
 }
 
 th {
@@ -305,16 +170,32 @@ th {
   color: var(--primary-color);
   padding: 15px 12px;
   text-transform: uppercase;
-  font-size: 0.9em;
+  font-size: 0.85em; /* Reduz o tamanho da fonte */
 }
 
 td {
   background-color: var(--background-card);
   border-bottom: 1px solid var(--accent-light);
   color: var(--text-color);
-  padding: 15px 12px;
+  padding: 12px; /* Padding reduzido */
+  font-size: 0.9em;
 }
 
 tr:last-child td {
   border-bottom: none;
+}
+
+/* Opcional: Estilo específico para o botão X na tabela */
+td button {
+  background-color: #ff0000;
+  padding: 5px 10px;
+  font-size: 0.8em;
+  height: auto;
+  width: auto;
+  display: inline-block; /* Sobrescreve a regra display:block do media query */
+}
+
+/* Ajuste do Header (Treino) */
+h4 {
+  font-size: 1.1em;
 }
