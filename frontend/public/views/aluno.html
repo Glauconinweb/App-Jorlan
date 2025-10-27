@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title id="aluno-titulo">Acompanhamento do Aluno</title>
+    <!-- Caminho relativo para CSS -->
     <link rel="stylesheet" href="/frontend/public/css/main.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
@@ -11,8 +12,8 @@
     <header>
       <h1>Treinador Pro</h1>
       <nav>
-        <a href="/">Dashboard</a>
-        <a href="/views/cadastro.html">Novo Aluno</a>
+        <a href="index.html">Dashboard</a>
+        <a href="cadastro.html">Novo Aluno</a>
       </nav>
     </header>
     <main>
@@ -59,8 +60,9 @@
             class="btn-acao"
             target="_blank"
             style="margin-left: 10px"
-            >Baixar Relatório PDF</a
           >
+            Baixar Relatório PDF
+          </a>
         </form>
         <p id="msg-evolucao"></p>
       </div>
@@ -88,8 +90,8 @@
     </main>
 
     <script>
-      const API_BASE_URL = window.location.origin;
-      const API_URL = `${API_BASE_URL}/api/alunos`;
+      // URL do backend no Render
+      const API_URL = "https://app-jorlan.onrender.com/api/alunos";
       const alunoId = new URLSearchParams(window.location.search).get("id");
       let alunoData = null;
       let chartInstance = null;
@@ -100,7 +102,6 @@
       async function carregarDados() {
         if (!alunoId) return;
         try {
-          // ✅ GET: Carrega detalhes do aluno
           const response = await fetch(`${API_URL}/${alunoId}`);
           alunoData = await response.json();
           if (alunoData.error) throw new Error(alunoData.error);
@@ -119,7 +120,7 @@
           document.getElementById("edit-objetivo").value =
             alunoData.objetivo || "";
 
-          // Configura o link de download (MÉTODO GET)
+          // Configura link de download PDF
           document.getElementById(
             "btn-download-pdf"
           ).href = `${API_URL}/pdf/download/${alunoId}`;
@@ -135,7 +136,6 @@
 
       function renderizarGrafico(evolucao) {
         if (chartInstance) chartInstance.destroy();
-
         const datas = evolucao.map((e) => formatarData(e.dataRegistro));
         const pesos = evolucao.map((e) => e.pesoKg);
         const gordura = evolucao.map((e) => e.percGordura);
@@ -151,7 +151,7 @@
               {
                 label: "Peso (Kg)",
                 data: pesos,
-                borderColor: "rgb(75, 192, 192)",
+                borderColor: "rgb(75,192,192)",
                 tension: 0.3,
                 fill: false,
                 pointRadius: 6,
@@ -160,7 +160,7 @@
               {
                 label: "% Gordura",
                 data: gordura,
-                borderColor: "rgb(255, 99, 132)",
+                borderColor: "rgb(255,99,132)",
                 tension: 0.3,
                 hidden: true,
                 fill: false,
@@ -180,18 +180,16 @@
         evolucao.reverse().forEach((e) => {
           const tr = document.createElement("tr");
           tr.innerHTML = `
-                    <td>${formatarData(e.dataRegistro)}</td>
-                    <td>${e.pesoKg.toFixed(1)} Kg</td>
-                    <td>${
-                      e.percGordura ? e.percGordura.toFixed(1) + "%" : "-"
-                    }</td>
-                    <td>${e.observacoes || "-"}</td>
-                `;
+            <td>${formatarData(e.dataRegistro)}</td>
+            <td>${e.pesoKg.toFixed(1)} Kg</td>
+            <td>${e.percGordura ? e.percGordura.toFixed(1) + "%" : "-"}</td>
+            <td>${e.observacoes || "-"}</td>
+          `;
           tbody.appendChild(tr);
         });
       }
 
-      // Lógica de Atualização Cadastral (PUT)
+      // Atualização do aluno (PUT)
       document
         .getElementById("form-edicao")
         .addEventListener("submit", async (e) => {
@@ -205,13 +203,11 @@
           };
 
           try {
-            // ✅ PUT: Atualiza ficha do aluno
             const response = await fetch(`${API_URL}/${alunoId}`, {
               method: "PUT",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(dados),
             });
-
             if (response.ok) {
               msg.textContent = "Ficha salva com sucesso!";
               msg.style.color = "green";
@@ -226,7 +222,7 @@
           }
         });
 
-      // Lógica de Novo Registro de Evolução (POST)
+      // Novo registro de evolução (POST)
       document
         .getElementById("form-evolucao")
         .addEventListener("submit", async (e) => {
@@ -239,13 +235,11 @@
           };
 
           try {
-            // ✅ POST: Adiciona novo registro de evolução
             const response = await fetch(`${API_URL}/${alunoId}/evolucao`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(dados),
             });
-
             if (response.ok) {
               msg.textContent = "Registro de evolução adicionado com sucesso!";
               msg.style.color = "green";

@@ -4,14 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Treinador Pro - Cadastro</title>
+    <!-- CSS ajustado para front hospedado -->
     <link rel="stylesheet" href="/frontend/public/css/main.css" />
   </head>
   <body>
     <header>
       <h1>Treinador Pro</h1>
       <nav>
-        <a href="/">Dashboard</a>
-        <a href="/views/cadastro.html">Novo Aluno</a>
+        <a href="index.html">Dashboard</a>
+        <a href="cadastro.html">Novo Aluno</a>
       </nav>
     </header>
     <main>
@@ -32,8 +33,8 @@
       </div>
     </main>
     <script>
-      const API_BASE_URL = window.location.origin;
-      const API_URL = `${API_BASE_URL}/api/alunos`;
+      // URL do backend no Render
+      const API_URL = "https://app-jorlan.onrender.com/api/alunos";
 
       document
         .getElementById("form-cadastro")
@@ -60,9 +61,9 @@
               msg.style.color = "green";
               document.getElementById("form-cadastro").reset();
 
-              // Opcional: Redireciona para o dashboard após 2 segundos
+              // Redireciona para o dashboard após 2 segundos
               setTimeout(() => {
-                window.location.href = "/";
+                window.location.href = "index.html";
               }, 2000);
             } else {
               msg.textContent = "Erro ao cadastrar.";

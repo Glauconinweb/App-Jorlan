@@ -4,14 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Treinador Pro - Dashboard</title>
+    <!-- CSS ajustado para front hospedado -->
     <link rel="stylesheet" href="/frontend/public/css/main.css" />
   </head>
   <body>
     <header>
       <h1>Treinador Pro</h1>
       <nav>
-        <a href="/">Dashboard</a>
-        <a href="/views/cadastro.html">Novo Aluno</a>
+        <a href="index.html">Dashboard</a>
+        <a href="cadastro.html">Novo Aluno</a>
       </nav>
     </header>
     <main>
@@ -31,9 +32,8 @@
     </main>
 
     <script>
-      // CRÍTICO: Define a URL da API dinamicamente
-      const API_BASE_URL = window.location.origin;
-      const API_URL = `${API_BASE_URL}/api/alunos`;
+      // URL do backend no Render
+      const API_URL = "https://app-jorlan.onrender.com/api/alunos";
 
       async function listarAlunos() {
         const tbody = document
@@ -44,20 +44,23 @@
           const response = await fetch(API_URL);
           const alunos = await response.json();
           tbody.innerHTML = "";
-          if (alunos.length === 0) {
+          if (!alunos || alunos.length === 0) {
             tbody.innerHTML =
               '<tr><td colspan="3">Nenhum aluno cadastrado.</td></tr>';
             return;
           }
+
           alunos.forEach((aluno) => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
-                        <td>${aluno.nome}</td>
-                        <td>${aluno.email || "-"}</td>
-                        <td><a href="/views/aluno.html?id=${
-                          aluno.id
-                        }" class="btn-acao">Acompanhar / Planilha</a></td>
-                    `;
+              <td>${aluno.nome}</td>
+              <td>${aluno.email || "-"}</td>
+              <td>
+                <a href="aluno.html?id=${aluno.id}" class="btn-acao">
+                  Acompanhar / Planilha
+                </a>
+              </td>
+            `;
             tbody.appendChild(tr);
           });
         } catch (error) {
@@ -65,6 +68,7 @@
             '<tr><td colspan="3">Erro ao carregar alunos. Verifique a conexão com o servidor.</td></tr>';
         }
       }
+
       listarAlunos();
     </script>
   </body>
