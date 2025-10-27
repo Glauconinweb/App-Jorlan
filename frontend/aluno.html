@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title id="aluno-titulo">Acompanhamento do Aluno</title>
-    <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/frontend/css/main.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   </head>
@@ -38,47 +38,60 @@
           <h4 style="color: var(--primary-color); margin-top: 20px">
             Detalhes do Treino (Treino A, B, C...)
           </h4>
-          <textarea
-            id="edit-treinoHtml"
-            placeholder="Digite aqui a estrutura do Treino A, Treino B, Treino C, etc."
-            rows="8"
-          ></textarea>
 
-          <button type="submit">Salvar Ficha e Treino</button>
+          <button type="submit">Salvar Dados</button>
           <p id="msg-edicao" style="margin-top: 10px"></p>
         </form>
+        <br />
+        <br />
+        <br />
+        <br />
+        <h2>Divisão de Treino (A/B/C)</h2>
 
-        <!-- NOVA SEÇÃO: Visualização estruturada do treino -->
-        <div id="visualizacao-treino" style="margin-top: 30px">
-          <h3 style="color: var(--primary-color)">
-            Visualização Estruturada do Treino
-          </h3>
-          <div
-            id="treino-estruturado"
-            style="padding: 15px; background: #fafafa; border-radius: 10px"
-          ></div>
-          <button
-            id="btn-pdf-treino"
-            style="
-              margin-top: 10px;
-              background: var(--primary-color);
-              color: white;
-              padding: 8px 14px;
-              border: none;
-              border-radius: 5px;
-              cursor: pointer;
-            "
-          >
-            Baixar Treino em PDF
+        <div class="tabs">
+          <button class="tab-button active" data-tab="tab-a">
+            Treino A (Superiores - Puxar)
           </button>
-
-          <h2>Exercícios</h2>
-          <div id="exercicios-lista"></div>
-
-          <button id="add-exercicio">Adicionar Exercício</button>
+          <button class="tab-button" data-tab="tab-b">
+            Treino B (Inferiores)
+          </button>
+          <button class="tab-button" data-tab="tab-c">
+            Treino C (Superiores - Empurrar)
+          </button>
         </div>
-      </div>
 
+        <div id="tab-a" class="tab-content active">
+          <h3>Treino A - Superiores</h3>
+          <div class="exercicios-lista"></div>
+          <button class="add-exercicio-btn" data-target="tab-a">
+            Adicionar Exercício
+          </button>
+        </div>
+
+        <div id="tab-b" class="tab-content">
+          <h3>Treino B - Inferiores</h3>
+          <div class="exercicios-lista"></div>
+          <button class="add-exercicio-btn" data-target="tab-b">
+            Adicionar Exercício
+          </button>
+        </div>
+
+        <div id="tab-c" class="tab-content">
+          <h3>Treino C - Outros</h3>
+          <div class="exercicios-lista"></div>
+          <button class="add-exercicio-btn" data-target="tab-c">
+            Adicionar Exercício
+          </button>
+        </div>
+
+        <button id="gerar-planilha-btn">
+          Gerar e Enviar Planilha (Simulação)
+        </button>
+      </div>
+      <br />
+      <br />
+      <br />
+      <br />
       <!-- ==================== EVOLUÇÃO ==================== -->
       <div class="card">
         <h3>Registrar Nova Evolução (Planilha de Entrada)</h3>

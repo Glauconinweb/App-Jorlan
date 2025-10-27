@@ -9,10 +9,184 @@
   --accent-light: #2c2c2c; /* Fundo de Linhas/Headers de Tabela */
   --white: #ffffff;
 }
+:root {
+  --color-dark: #1a1a1a;
+  --color-light: #ffffff;
+  --color-highlight: #ff8c00; /* Laranja */
+  --color-grey-bg: #2b2b2b;
+  --color-border: #444;
+}
 
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--color-dark);
+  color: var(--color-light);
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background-color: var(--color-highlight);
+  padding: 20px;
+  text-align: center;
+  color: var(--color-dark);
+  margin-bottom: 20px;
+}
+
+header h1 {
+  margin: 0;
+}
+
+header p {
+  margin-top: 5px;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+h2 {
+  color: var(--color-highlight);
+  border-bottom: 2px solid var(--color-highlight);
+  padding-bottom: 5px;
+  margin-top: 30px;
+}
+
+/* Ficha Info */
+#ficha-info {
+  display: flex;
+  gap: 20px;
+  padding: 15px;
+  background-color: var(--color-grey-bg);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+#ficha-info label,
+#ficha-info input {
+  color: var(--color-light);
+}
+
+#ficha-info input {
+  flex-grow: 1;
+  padding: 8px;
+  border: none;
+  background-color: #3a3a3a;
+  border-radius: 4px;
+}
+
+/* Abas (Tabs) */
+.tabs {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.tab-button {
+  background-color: var(--color-grey-bg);
+  color: var(--color-light);
+  border: 1px solid var(--color-border);
+  border-bottom: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  margin-right: 5px;
+  transition: background-color 0.3s;
+}
+
+.tab-button:hover:not(.active) {
+  background-color: #444;
+}
+
+.tab-button.active {
+  background-color: var(--color-highlight);
+  color: var(--color-dark);
+  font-weight: bold;
+}
+
+.tab-content {
+  background-color: var(--color-grey-bg);
+  padding: 20px;
+  border-radius: 0 8px 8px 8px;
+  border: 1px solid var(--color-border);
+  display: none; /* Esconder por padrão */
+}
+
+.tab-content.active {
+  display: block; /* Mostrar o conteúdo ativo */
+}
+
+/* Estilo do Exercício (Formato de Ficha/Card) */
+.exercicio-item {
+  background-color: #3a3a3a;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border-left: 5px solid var(--color-highlight); /* Destaque lateral */
+}
+
+.exercicio-item h4 {
+  color: var(--color-highlight);
+  margin-top: 0;
+  border-bottom: 1px solid #444;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+}
+
+.exercicio-item label {
+  display: block;
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: #ccc;
+}
+
+.exercicio-item input {
+  width: calc(100% - 16px);
+  padding: 8px;
+  margin-top: 5px;
+  box-sizing: border-box;
+  border: none;
+  background-color: #555;
+  color: var(--color-light);
+  border-radius: 3px;
+}
+
+/* Botões de Ação */
+.add-exercicio-btn,
+#gerar-planilha-btn,
+.remover-exercicio-btn {
+  padding: 10px 15px;
+  margin-top: 15px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.add-exercicio-btn {
+  background-color: var(--color-highlight);
+  color: var(--color-dark);
+}
+
+.remover-exercicio-btn {
+  background-color: #d9534f; /* Vermelho */
+  color: var(--color-light);
+  float: right;
+  margin-top: -30px; /* Alinhar com o título do exercício */
+}
+
+#gerar-planilha-btn {
+  display: block;
+  width: 100%;
+  background-color: #007bff; /* Azul para ação final */
+  color: var(--color-light);
+  margin-top: 30px;
+  margin-bottom: 50px;
+}
 body {
   font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; /* Fonte mais moderna */
   margin: 0;
+  background-image: url(/frontend/imagem/f.s.jorlan.jpg);
   padding: 0;
   background-color: var(--background-main); /* Fundo Dark Mode */
   color: var(--text-color);

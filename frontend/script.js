@@ -1,50 +1,101 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const addExercicioBtn = document.getElementById("add-exercicio");
-  const exerciciosLista = document.getElementById("exercicios-lista");
-  let exercicioCount = 0;
+  // ----------------------------------------------------
+  // 1. Lógica de Abas (Divisão de Treinos)
+  // ----------------------------------------------------
+  const tabButtons = document.querySelectorAll(".tab-button");
+  const tabContents = document.querySelectorAll(".tab-content");
 
-  addExercicioBtn.addEventListener("click", () => {
-    exercicioCount++;
+  tabButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const targetId = button.getAttribute("data-tab");
 
-    // 1. Criar o container do exercício
-    const exercicioDiv = document.createElement("div");
-    exercicioDiv.classList.add("exercicio-item");
-    exercicioDiv.id = `exercicio-${exercicioCount}`;
+      // Desativa todos
+      tabButtons.forEach((btn) => btn.classList.remove("active"));
+      tabContents.forEach((content) => content.classList.remove("active"));
 
-    // 2. Adicionar os inputs
-    exercicioDiv.innerHTML = `
-            <h3>Exercício #${exercicioCount}</h3>
-            <label>Nome:</label>
-            <input type="text" placeholder="Ex: Agachamento Livre">
-            
-            <label>Séries:</label>
-            <input type="number" value="3" min="1">
-            
-            <label>Repetições:</label>
-            <input type="text" value="8-12" placeholder="Ex: 8-12 ou 10">
-            
-            <label>Obs:</label>
-            <input type="text" placeholder="Ex: Carga 80% de 1RM">
-            
-            <button class="remover-exercicio" data-id="${exercicioCount}">Remover</button>
-            <hr>
-        `;
-
-    // 3. Inserir na lista
-    exerciciosLista.appendChild(exercicioDiv);
+      // Ativa o botão e o conteúdo correspondente
+      button.classList.add("active");
+      document.getElementById(targetId).classList.add("active");
+    });
   });
 
-  // 4. Lógica de remover (Opcional, mas útil para o teste)
-  exerciciosLista.addEventListener("click", (e) => {
-    if (e.target.classList.contains("remover-exercicio")) {
-      const id = e.target.getAttribute("data-id");
-      const elementToRemove = document.getElementById(`exercicio-${id}`);
+  // ----------------------------------------------------
+  // 2. Lógica de Adicionar/Remover Exercícios
+  // ----------------------------------------------------
+  const addExercicioBtns = document.querySelectorAll(".add-exercicio-btn");
+  const exercicioCounts = {
+    "tab-a": 0,
+    "tab-b": 0,
+    "tab-c": 0,
+  };
+
+  const createExercicioHTML = (tabId) => {
+    exercicioCounts[tabId]++;
+    const count = exercicioCounts[tabId];
+    const uniqueId = `${tabId}-ex-${count}`;
+
+    return `
+      <div class="exercicio-item" data-unique-id="${uniqueId}">
+        <div class="exercicio-header">
+          <h4>Exercício ${count}</h4>
+          <button type="button" class="remover-exercicio-btn" data-id="${uniqueId}">
+            Remover
+          </button>
+        </div>
+
+        <label>Nome do Exercício:</label>
+        <input type="text" placeholder="Ex: Agachamento Livre, Supino Reto, Remada Curvada">
+
+        <label>Séries:</label>
+        <input type="number" value="3" min="1" style="width: 50px; display: inline-block;">
+
+        <label>Repetições:</label>
+        <input type="text" value="10-12" placeholder="Ex: 8-12 ou 10 Reps">
+
+        <label>Carga (Opcional):</label>
+        <input type="text" placeholder="Ex: 20kg (cada lado) ou Carga Máx.">
+
+        <label>Intervalo (seg):</label>
+        <input type="number" value="60" min="10" style="width: 50px; display: inline-block;">
+
+        <label>Observação/Técnica:</label>
+        <input type="text" placeholder="Ex: Cadência 3-1-1; Falha Concêntrica">
+      </div>
+    `;
+  };
+
+  addExercicioBtns.forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const tabId = e.target.getAttribute("data-target");
+      const lista = document.querySelector(`#${tabId} .exercicios-lista`);
+      lista.insertAdjacentHTML("beforeend", createExercicioHTML(tabId));
+    });
+  });
+
+  // ----------------------------------------------------
+  //  🔥 CORREÇÃO: Event Delegation GLOBAL
+  // ----------------------------------------------------
+  document.body.addEventListener("click", (e) => {
+    if (e.target.classList.contains("remover-exercicio-btn")) {
+      const uniqueId = e.target.getAttribute("data-id");
+      const elementToRemove = document.querySelector(
+        `.exercicio-item[data-unique-id="${uniqueId}"]`
+      );
       if (elementToRemove) {
         elementToRemove.remove();
       }
     }
   });
 
-  // DICA: Adicione um console.log ou alerta simples para mostrar que "enviou"
-  // Pode ser um botão "Gerar Planilha" que simplesmente pega os dados e mostra no console.
+  // ----------------------------------------------------
+  // 3. Simulação de Envio
+  // ----------------------------------------------------
+  document
+    .getElementById("gerar-planilha-btn")
+    .addEventListener("click", () => {
+      const aluno = document.getElementById("aluno").value;
+      alert(
+        `✅ Planilha de Treino de ${aluno} Gerada com Sucesso!\n\nVocê pode salvar, enviar por WhatsApp ou exportar em PDF.`
+      );
+    });
 });
