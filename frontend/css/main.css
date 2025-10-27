@@ -1,40 +1,43 @@
-/* public/css/main.css - Esquema Preto e Laranja */
+/* public/css/main.css - Estética Fitness Laranja e Preto */
 :root {
-  --primary-color: #ff6600; /* Laranja da Logo */
-  --secondary-color: #1a1a1a; /* Preto Principal */
-  --text-color: #333333;
-  --background-light: #f0f0f0;
-  --background-dark: #2c2c2c;
+  --primary-color: #ff6600; /* Laranja Vibrante (Destaque/Motivação) */
+  --secondary-color: #1a1a1a; /* Preto Profundo (Fundo Dark) */
+  --text-color: #e0e0e0; /* Texto Principal Claro */
+  --text-dark: #333333; /* Usado em elementos claros, se necessário */
+  --background-main: #121212; /* Fundo Escuro Principal */
+  --background-card: #1e1e1e; /* Fundo de Card Um Pouco Mais Claro */
+  --accent-light: #2c2c2c; /* Fundo de Linhas/Headers de Tabela */
   --white: #ffffff;
 }
 
 body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Inter", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; /* Fonte mais moderna */
   margin: 0;
   padding: 0;
-  background-color: var(--background-light);
+  background-color: var(--background-main); /* Fundo Dark Mode */
   color: var(--text-color);
 }
 
 header {
   background-color: var(--secondary-color);
   color: var(--white);
-  padding: 20px 0;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  padding: 25px 0; /* Mais espaçamento */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Sombra mais marcada */
   text-align: center;
 }
 
 header h1 {
   margin: 0;
   color: var(--primary-color);
+  font-size: 2.2em;
+  letter-spacing: 1px; /* Estilo motivacional */
 }
 
 nav a {
-  color: var(--white);
+  color: var(--text-color);
   text-decoration: none;
-  padding: 0 15px;
-  font-weight: bold;
+  padding: 0 20px;
+  font-weight: 600; /* Mais peso */
   transition: color 0.3s;
 }
 
@@ -44,23 +47,24 @@ nav a:hover {
 
 main {
   max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+  margin: 30px auto; /* Mais margem superior */
+  padding: 0 20px;
 }
 
 h2 {
   color: var(--primary-color);
   border-bottom: 2px solid var(--primary-color);
-  padding-bottom: 5px;
-  margin-top: 30px;
+  padding-bottom: 8px;
+  margin-top: 40px;
+  font-size: 1.8em;
 }
 
 .card {
-  background-color: var(--white);
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+  background-color: var(--background-card); /* Card escuro */
+  padding: 25px;
+  border-radius: 12px; /* Cantos mais arredondados */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--accent-light); /* Borda sutil */
 }
 
 /* Formulários e Botões */
@@ -69,47 +73,69 @@ input[type="email"],
 input[type="number"],
 textarea {
   width: calc(100% - 22px);
-  padding: 10px;
-  margin: 5px 0 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 12px;
+  margin: 8px 0 15px 0;
+  border: 1px solid var(--accent-light);
+  border-radius: 8px; /* Cantos arredondados nos inputs */
   box-sizing: border-box;
+  background-color: var(--background-main); /* Input dark */
+  color: var(--text-color);
+  font-size: 1em;
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--primary-color); /* Foco vibrante */
+  outline: none;
 }
 
 button,
 .btn-acao {
   background-color: var(--primary-color);
-  color: var(--secondary-color);
-  padding: 10px 15px;
+  color: var(--secondary-color); /* Texto escuro no botão laranja */
+  padding: 12px 25px;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
   text-decoration: none;
   display: inline-block;
-  font-weight: bold;
-  transition: background-color 0.3s;
+  font-weight: 700;
+  text-transform: uppercase; /* Mais impactante */
+  letter-spacing: 0.5px;
+  transition: background-color 0.2s, transform 0.1s;
 }
 
 button:hover,
 .btn-acao:hover {
-  background-color: #ff8833; /* Laranja mais claro no hover */
+  background-color: #ff8833;
+  transform: translateY(-1px); /* Pequeno efeito 3D */
 }
 
 /* Tabelas */
 table {
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 15px;
-}
-
-th,
-td {
-  border: 1px solid #ddd;
-  padding: 12px;
-  text-align: left;
+  border-collapse: separate; /* Permite bordas arredondadas e espaçamento */
+  border-spacing: 0;
+  border-radius: 8px;
+  overflow: hidden; /* Garante que bordas arredondadas funcionem */
+  margin-top: 25px;
 }
 
 th {
-  background-color: var(--background-light);
-  color: var(--secondary-color);
+  background-color: var(--accent-light);
+  color: var(--primary-color);
+  padding: 15px 12px;
+  text-transform: uppercase;
+  font-size: 0.9em;
+}
+
+td {
+  background-color: var(--background-card);
+  border-bottom: 1px solid var(--accent-light);
+  color: var(--text-color);
+  padding: 15px 12px;
+}
+
+tr:last-child td {
+  border-bottom: none;
 }
