@@ -7,23 +7,20 @@
     <link rel="stylesheet" href="./css/main.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="icon" type="image/png" href="/imagem/jjj.jpg" />
     <style>
-      /* Ajustes mobile */
       body {
         padding: 0 10px;
       }
-
       header h1 {
         font-size: 1.5em;
       }
-
       nav a {
         display: inline-block;
         margin: 5px 10px;
         font-size: 0.9em;
       }
-
       input,
       textarea,
       button {
@@ -31,48 +28,43 @@
         width: 100%;
         margin-bottom: 8px;
       }
-
       button {
         cursor: pointer;
       }
-
       .tabs {
         display: flex;
         flex-wrap: wrap;
       }
-
       .tab-button {
         flex: 1 1 auto;
         margin: 5px 2px;
       }
-
       .tab-content {
         margin-top: 10px;
+        display: none;
       }
-
+      .tab-content.active {
+        display: block;
+      }
       .exercicio-item input {
         width: 100%;
         margin-bottom: 5px;
       }
-
       table {
         width: 100%;
         overflow-x: auto;
         display: block;
       }
-
       table th,
       table td {
         white-space: nowrap;
       }
-
       @media (max-width: 600px) {
         nav a {
           display: block;
           margin: 5px 0;
           text-align: center;
         }
-
         .tab-button {
           flex: 1 1 100%;
         }
@@ -92,7 +84,6 @@
     <main>
       <h2 id="aluno-nome-header">Detalhes do Aluno</h2>
 
-      <!-- ==================== FICHA E TREINO ==================== -->
       <div class="card">
         <h3>Ficha e Treino (Editar)</h3>
         <form id="form-edicao">
@@ -105,20 +96,18 @@
           <input type="email" id="edit-email" placeholder="Email" />
           <input type="number" id="edit-alturaCm" placeholder="Altura (cm)" />
           <input type="text" id="edit-objetivo" placeholder="Objetivo" />
-
+          <textarea
+            id="edit-treinoHtml"
+            placeholder="HTML do Treino"
+          ></textarea>
           <h4 style="color: var(--primary-color); margin-top: 20px">
             Detalhes do Treino (Treino A, B, C...)
           </h4>
-
           <button type="submit">Salvar Dados</button>
           <p id="msg-edicao" style="margin-top: 10px"></p>
         </form>
-        <br />
-        <br />
-        <br />
-        <br />
-        <h2>Divisão de Treino (A/B/C)</h2>
 
+        <h2>Divisão de Treino (A/B/C)</h2>
         <div class="tabs">
           <button class="tab-button active" data-tab="tab-a">
             Treino A (Superiores - Puxar)
@@ -138,7 +127,6 @@
             Adicionar Exercício
           </button>
         </div>
-
         <div id="tab-b" class="tab-content">
           <h3>Treino B - Inferiores</h3>
           <div class="exercicios-lista"></div>
@@ -146,7 +134,6 @@
             Adicionar Exercício
           </button>
         </div>
-
         <div id="tab-c" class="tab-content">
           <h3>Treino C - Superiores</h3>
           <div class="exercicios-lista"></div>
@@ -159,11 +146,7 @@
           Baixar Planilha de Treino em PDF
         </button>
       </div>
-      <br />
-      <br />
-      <br />
-      <br />
-      <!-- ==================== EVOLUÇÃO ==================== -->
+
       <div class="card">
         <h3>Registrar Nova Evolução (Planilha de Entrada)</h3>
         <form id="form-evolucao">
@@ -186,7 +169,6 @@
         <p id="msg-evolucao"></p>
       </div>
 
-      <!-- ==================== GRÁFICO E HISTÓRICO ==================== -->
       <div class="card">
         <h3>Gráficos e Histórico de Acompanhamento</h3>
         <div class="grafico-container">
@@ -213,11 +195,10 @@
     <script>
       const API_URL = "https://app-jorlan.onrender.com/api/alunos";
       const alunoId = new URLSearchParams(window.location.search).get("id");
-      let alunoData = null;
-      let chartInstance = null;
+      let alunoData = null,
+        chartInstance = null;
 
-      const formatarData = (isoString) =>
-        new Date(isoString).toLocaleDateString("pt-BR");
+      const formatarData = (iso) => new Date(iso).toLocaleDateString("pt-BR");
 
       async function deletarRegistro(evolucaoId) {
         if (
@@ -225,8 +206,9 @@
         )
           return;
         try {
-          const deleteUrl = `${API_URL}/evolucao/${evolucaoId}`;
-          const response = await fetch(deleteUrl, { method: "DELETE" });
+          const response = await fetch(`${API_URL}/evolucao/${evolucaoId}`, {
+            method: "DELETE",
+          });
           if (response.ok) {
             alert("Registro deletado com sucesso!");
             carregarDados();
@@ -234,7 +216,7 @@
             const error = await response.json();
             alert(`Falha ao deletar: ${error.error}`);
           }
-        } catch (error) {
+        } catch {
           alert("Erro de conexão ao deletar registro.");
         }
       }
@@ -261,13 +243,8 @@
           document.getElementById("edit-treinoHtml").value =
             alunoData.treinoHtml || "";
 
-          document.getElementById(
-            "btn-download-pdf"
-          ).href = `${API_URL}/pdf/download/${alunoId}`;
-
           renderizarTabela(alunoData.evolucao);
           renderizarGrafico(alunoData.evolucao);
-          renderizarTreino(alunoData.treinoHtml);
         } catch (error) {
           document.getElementById(
             "aluno-nome-header"
@@ -275,62 +252,11 @@
         }
       }
 
-      // ==================== VISUALIZAÇÃO E PDF DO TREINO ====================
-      function renderizarTreino(treinoHtml) {
-        const container = document.getElementById("treino-estruturado");
-        container.innerHTML = "";
-
-        if (!treinoHtml) {
-          container.innerHTML =
-            "<p style='color:gray'>Nenhum treino cadastrado ainda.</p>";
-          return;
-        }
-
-        // Quebra o texto por "Treino A:", "Treino B:", etc.
-        const blocos = treinoHtml
-          .split(/Treino\s([A-Z]):/)
-          .filter((b) => b.trim() !== "");
-        for (let i = 0; i < blocos.length; i += 2) {
-          const nome = blocos[i];
-          const conteudo = blocos[i + 1] ? blocos[i + 1].trim() : "";
-          const div = document.createElement("div");
-          div.style.marginBottom = "15px";
-          div.innerHTML = `
-          <h4 style="color:#007bff">Treino ${nome}</h4>
-          <pre style="background:#fff; padding:10px; border-radius:6px; white-space:pre-wrap;">${conteudo}</pre>
-        `;
-          container.appendChild(div);
-        }
-      }
-
-      document
-        .getElementById("btn-pdf-treino")
-        .addEventListener("click", () => {
-          if (!alunoData?.treinoHtml) {
-            alert("Nenhum treino disponível para exportar.");
-            return;
-          }
-
-          const { jsPDF } = window.jspdf;
-          const doc = new jsPDF();
-          doc.setFontSize(16);
-          doc.text(`Ficha de Treino - ${alunoData.nome}`, 10, 15);
-          doc.setFontSize(12);
-          const treinoFormatado = alunoData.treinoHtml.replace(
-            /Treino/g,
-            "\nTreino"
-          );
-          doc.text(treinoFormatado, 10, 30);
-          doc.save(`Treino_${alunoData.nome.replace(/\s+/g, "_")}.pdf`);
-        });
-
-      // ==================== GRÁFICO ====================
       function renderizarGrafico(evolucao) {
         if (chartInstance) chartInstance.destroy();
         const datas = evolucao.map((e) => formatarData(e.dataRegistro));
         const pesos = evolucao.map((e) => e.pesoKg);
         const gordura = evolucao.map((e) => e.percGordura);
-
         const ctx = document
           .getElementById("grafico-evolucao")
           .getContext("2d");
@@ -362,26 +288,24 @@
         });
       }
 
-      // ==================== HISTÓRICO ====================
       function renderizarTabela(evolucao) {
         const tbody = document.querySelector("#tabela-historico tbody");
         tbody.innerHTML = "";
-        evolucao.reverse().forEach((e) => {
+        [...evolucao].reverse().forEach((e) => {
           const tr = document.createElement("tr");
-          tr.innerHTML = `
-          <td>${formatarData(e.dataRegistro)}</td>
-          <td>${e.pesoKg.toFixed(1)} Kg</td>
-          <td>${e.percGordura ? e.percGordura.toFixed(1) + "%" : "-"}</td>
-          <td>${e.observacoes || "-"}</td>
-          <td><button onclick="deletarRegistro('${
-            e.id
-          }')" style="padding:5px 10px; background-color:#ff0000; color:white; border-radius:4px; border:none; cursor:pointer;">X</button></td>
-        `;
+          tr.innerHTML = `<td>${formatarData(e.dataRegistro)}</td>
+                          <td>${e.pesoKg.toFixed(1)} Kg</td>
+                          <td>${
+                            e.percGordura ? e.percGordura.toFixed(1) + "%" : "-"
+                          }</td>
+                          <td>${e.observacoes || "-"}</td>
+                          <td><button onclick="deletarRegistro('${
+                            e.id
+                          }')" style="padding:5px 10px; background-color:#ff0000; color:white; border-radius:4px; border:none; cursor:pointer;">X</button></td>`;
           tbody.appendChild(tr);
         });
       }
 
-      // ==================== PUT E POST ====================
       document
         .getElementById("form-edicao")
         .addEventListener("submit", async (e) => {
@@ -394,7 +318,6 @@
             objetivo: document.getElementById("edit-objetivo").value,
             treinoHtml: document.getElementById("edit-treinoHtml").value,
           };
-
           try {
             const response = await fetch(`${API_URL}/${alunoId}`, {
               method: "PUT",
@@ -409,7 +332,7 @@
               msg.textContent = `Falha ao salvar ficha. Erro: ${response.status}`;
               msg.style.color = "red";
             }
-          } catch (error) {
+          } catch {
             msg.textContent = "Erro de conexão (PUT).";
             msg.style.color = "red";
           }
@@ -425,7 +348,6 @@
             percGordura: document.getElementById("gordura").value,
             observacoes: document.getElementById("observacoes").value,
           };
-
           try {
             const response = await fetch(`${API_URL}/${alunoId}/evolucao`, {
               method: "POST",
@@ -441,144 +363,89 @@
               msg.textContent = `Erro ao registrar evolução. Erro: ${response.status}`;
               msg.style.color = "red";
             }
-          } catch (error) {
+          } catch {
             msg.textContent = "Erro de conexão (POST).";
             msg.style.color = "red";
           }
         });
 
-      carregarDados();
-    </script>
-    <!-- Adicione no final do <body> do seu index.html -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script>
       document.addEventListener("DOMContentLoaded", () => {
-        // ----------------------------------------------------
-        // 1. Lógica de Abas (Divisão de Treinos)
-        // ----------------------------------------------------
         const tabButtons = document.querySelectorAll(".tab-button");
         const tabContents = document.querySelectorAll(".tab-content");
-
-        tabButtons.forEach((button) => {
-          button.addEventListener("click", () => {
-            const targetId = button.getAttribute("data-tab");
-
-            // Desativa todos
-            tabButtons.forEach((btn) => btn.classList.remove("active"));
-            tabContents.forEach((content) =>
-              content.classList.remove("active")
-            );
-
-            // Ativa o botão e o conteúdo correspondente
-            button.classList.add("active");
+        tabButtons.forEach((btn) =>
+          btn.addEventListener("click", () => {
+            const targetId = btn.getAttribute("data-tab");
+            tabButtons.forEach((b) => b.classList.remove("active"));
+            tabContents.forEach((c) => c.classList.remove("active"));
+            btn.classList.add("active");
             document.getElementById(targetId).classList.add("active");
-          });
-        });
+          })
+        );
 
-        // ----------------------------------------------------
-        // 2. Adicionar e Remover Exercícios
-        // ----------------------------------------------------
         const addExercicioBtns =
           document.querySelectorAll(".add-exercicio-btn");
         const exercicioCounts = { "tab-a": 0, "tab-b": 0, "tab-c": 0 };
-
         const createExercicioHTML = (tabId) => {
           exercicioCounts[tabId]++;
           const count = exercicioCounts[tabId];
-          const uniqueId = `${tabId}-ex-${count}`;
-          return `
-        <div class="exercicio-item" data-unique-id="${uniqueId}">
-          <div class="exercicio-header">
-            <h4>Exercício ${count}</h4>
-            <button type="button" class="remover-exercicio-btn" data-id="${uniqueId}">Remover</button>
-          </div>
-
-          <label>Nome do Exercício:</label>
-          <input type="text" placeholder="Ex: Agachamento Livre, Supino Reto, Remada Curvada">
-
-          <label>Séries:</label>
-          <input type="number" value="3" min="1" style="width: 60px; display: inline-block;">
-
-          <label>Repetições:</label>
-          <input type="text" value="10-12" placeholder="Ex: 8-12 ou 10 Reps">
-
-          <label>Carga (Opcional):</label>
-          <input type="text" placeholder="Ex: 20kg (cada lado)">
-
-          <label>Intervalo (seg):</label>
-          <input type="number" value="60" min="10" style="width: 60px; display: inline-block;">
-
-          <label>Observação/Técnica:</label>
-          <input type="text" placeholder="Ex: Cadência 3-1-1; Falha Concêntrica">
-        </div>
-      `;
+          const uid = `${tabId}-ex-${count}`;
+          return `<div class="exercicio-item" data-unique-id="${uid}">
+            <div class="exercicio-header"><h4>Exercício ${count}</h4>
+            <button type="button" class="remover-exercicio-btn" data-id="${uid}">Remover</button></div>
+            <label>Nome do Exercício:</label><input type="text" placeholder="Ex: Agachamento Livre, Supino Reto, Remada Curvada">
+            <label>Séries:</label><input type="number" value="3" min="1" style="width: 60px; display: inline-block;">
+            <label>Repetições:</label><input type="text" value="10-12" placeholder="Ex: 8-12 ou 10 Reps">
+            <label>Carga (Opcional):</label><input type="text" placeholder="Ex: 20kg (cada lado)">
+            <label>Intervalo (seg):</label><input type="number" value="60" min="10" style="width: 60px; display: inline-block;">
+            <label>Observação/Técnica:</label><input type="text" placeholder="Ex: Cadência 3-1-1; Falha Concêntrica">
+          </div>`;
         };
-
-        addExercicioBtns.forEach((btn) => {
+        addExercicioBtns.forEach((btn) =>
           btn.addEventListener("click", (e) => {
             const tabId = e.target.getAttribute("data-target");
             const lista = document.querySelector(`#${tabId} .exercicios-lista`);
             lista.insertAdjacentHTML("beforeend", createExercicioHTML(tabId));
-          });
-        });
+          })
+        );
 
-        // ----------------------------------------------------
-        // 3. Remover exercício
-        // ----------------------------------------------------
         document.body.addEventListener("click", (e) => {
           if (e.target.classList.contains("remover-exercicio-btn")) {
-            const uniqueId = e.target.getAttribute("data-id");
-            const elementToRemove = document.querySelector(
-              `.exercicio-item[data-unique-id="${uniqueId}"]`
+            const uid = e.target.getAttribute("data-id");
+            const el = document.querySelector(
+              `.exercicio-item[data-unique-id="${uid}"]`
             );
-            if (elementToRemove) elementToRemove.remove();
+            if (el) el.remove();
           }
         });
 
-        // ----------------------------------------------------
-        // 4. Gerar e baixar PDF (funciona no celular)
-        // ----------------------------------------------------
         document
           .getElementById("gerar-planilha-btn")
           .addEventListener("click", async () => {
             const { jsPDF } = window.jspdf;
-
-            const conteudo = document.querySelector("main") || document.body;
+            const conteudo = document.querySelector("main");
             const canvas = await html2canvas(conteudo, { scale: 2 });
-
             const imgData = canvas.toDataURL("image/png");
             const pdf = new jsPDF("p", "mm", "a4");
-
-            // Calcular proporção da imagem para caber na folha
             const pageWidth = pdf.internal.pageSize.getWidth();
             const pageHeight = pdf.internal.pageSize.getHeight();
-            const imgWidth = pageWidth;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-            let position = 0;
-            if (imgHeight < pageHeight) {
-              pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-            } else {
-              let heightLeft = imgHeight;
-              let y = 0;
-              while (heightLeft > 0) {
-                pdf.addImage(imgData, "PNG", 0, y, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-                if (heightLeft > 0) {
-                  pdf.addPage();
-                  y -= pageHeight;
-                }
+            const imgHeight = (canvas.height * pageWidth) / canvas.width;
+            let heightLeft = imgHeight,
+              y = 0;
+            while (heightLeft > 0) {
+              pdf.addImage(imgData, "PNG", 0, y, pageWidth, imgHeight);
+              heightLeft -= pageHeight;
+              if (heightLeft > 0) {
+                pdf.addPage();
+                y -= pageHeight;
               }
             }
-
             const nomeAluno =
-              document.getElementById("aluno")?.value || "treino";
+              document.getElementById("edit-nome").value || "treino";
             pdf.save(`${nomeAluno}_planilha_treino.pdf`);
           });
       });
-    </script>
 
-    <script src="script.js"></script>
+      carregarDados();
+    </script>
   </body>
 </html>
