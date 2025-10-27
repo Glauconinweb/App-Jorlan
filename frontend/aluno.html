@@ -1,690 +1,448 @@
-esta chegando no backend porem o grafico não aparece o que pode ser ?
-pasted_content.txt Texto · 19.23 KB Lite Recebi sua solicitação. Vou analisar o
-conteúdo do arquivo de texto para entender o contexto do seu problema com o
-gráfico que não aparece no frontend, apesar dos dados chegarem no backend. Em
-seguida, vou investigar as possíveis causas e sugerir soluções. Lite Para te
-ajudar a identificar por que o gráfico não aparece, preciso de algumas
-informações: Qual biblioteca você está usando para o gráfico? (Chart.js,
-Recharts, ApexCharts, D3.js, etc.) Você pode compartilhar o código do componente
-frontend que deveria exibir o gráfico? Os dados estão chegando corretamente?
-Você consegue ver os dados no console do navegador (console.log)? Por favor,
-compartilhe o código do componente que renderiza o gráfico para eu analisar o
-problema. Chart.js, pasted_content_2.txt Texto · 19.23 KB Percebi que o canvas
-do gráfico tem o ID "grafico-evolucao", mas não identifiquei o código que
-inicializa e renderiza o Chart.js. Preciso verificar se o código de criação do
-gráfico está presente e correto para resolver o problema. Lite Obrigado por
-compartilhar o código! Analisando o código, a lógica de renderização do gráfico
-com Chart.js está na função renderizarGrafico(evolucao). O problema de o gráfico
-não aparecer, mesmo com os dados chegando no backend, geralmente tem três causas
-principais no frontend: Dados de evolucao vazios ou incorretos: A função
-renderizarGrafico é chamada com alunoData.evolucao. Se essa array estiver vazia,
-o gráfico não terá o que desenhar. Referência ao Canvas incorreta: O elemento
-<canvas id="grafico-evolucao">
-  pode não estar sendo encontrado ou o contexto 2D (.getContext("2d")) está
-  falhando. Conflito de renderização/destruição: A linha if (chartInstance)
-  chartInstance.destroy(); está correta para evitar conflitos, mas se houver
-  algum erro antes dela, pode ser um problema. Para depurar, adicionei alguns
-  console.log na função renderizarGrafico e um título forçado no gráfico
-  (Gráfico de Evolução (Debug)). JavaScript function renderizarGrafico(evolucao)
-  { console.log("Iniciando renderização do gráfico. Dados de evolução:",
-  evolucao); // <--- NOVO if (chartInstance) chartInstance.destroy(); const
-  datas = evolucao.map((e) => formatarData(e.dataRegistro)); const pesos =
-  evolucao.map((e) => e.pesoKg); const gordura = evolucao.map((e) =>
-  e.percGordura); console.log("Datas:", datas); // <--- NOVO
-  console.log("Pesos:", pesos); // <--- NOVO console.log("Gordura:", gordura);
-  // <--- NOVO // ... chartInstance = new Chart(ctx, { // ... options: {
-  responsive: true, plugins: { title: { display: true, text: 'Gráfico de
-  Evolução (Debug)' // <--- NOVO } } }, }); } Próximo passo: Substitua o seu
-  arquivo com o código que enviei (o arquivo pasted_content_2.txt modificado).
-  Abra a página no navegador e abra o Console de Desenvolvedor (Geralmente F12).
-  Carregue a página e verifique as mensagens no console. Por favor, me diga o
-  que aparece no console do navegador quando a página é carregada. Isso vai me
-  dizer se a função está sendo chamada e se os dados estão sendo processados
-  corretamente. Se o gráfico ainda não aparecer, mas você vir as mensagens no
-  console com os dados, o problema é na inicialização do Chart.js. Se você não
-  vir as mensagens, o problema é na chamada da função carregarDados() ou na
-  estrutura dos dados retornados pelo backend. Novo conhecimento sugerido
-  atualize o codico inteiro para mim A função `renderizarGrafico` é chamada e
-  recebe dados, mas o gráfico não aparece; adicionei logs para verificar se os
-  dados estão corretos e se a inicialização do Chart.js ocorre. Lite
-  Compreendido. Fiz a revisão e a correção no código completo. O problema mais
-  provável era que os dados de pesoKg e percGordura estavam sendo passados como
-  strings para o Chart.js, o que impede a renderização correta do gráfico. A
-  correção foi aplicada na função renderizarGrafico: Conversão Explícita para
-  Número: Adicionei parseFloat() para garantir que os valores de pesoKg e
-  percGordura sejam tratados como números pelo Chart.js: JavaScript const pesos
-  = evolucao.map((e) => parseFloat(e.pesoKg)); const gordura = evolucao.map((e)
-  => parseFloat(e.percGordura)); Tratamento de Dados Vazios: Adicionei uma
-  verificação para não tentar renderizar o gráfico se a lista de evolucao
-  estiver vazia. Ajuste na Tabela: Adicionei parseFloat().toFixed(1) na função
-  renderizarTabela para garantir que a exibição na tabela também seja formatada
-  corretamente. Ajuste no POST de Evolução: Garanti que os valores de pesoKg e
-  percGordura sejam convertidos para parseFloat antes de serem enviados no POST.
-  Por favor, substitua o conteúdo do seu arquivo pelo novo código anexado
-  (pasted_content_2.txt). O gráfico deve aparecer agora, desde que a array
-  alunoData.evolucao retorne dados válidos do backend. pasted_content_2.txt
-  Texto · 21.22 KB Ver todos os arquivos nesta tarefa Tarefa concluída Como foi
-  este resultado? Sugestões de acompanhamento Enviar mensagem para Manus
-  pasted_content_2.txt
-  <!DOCTYPE html>
-  <html lang="pt-BR">
-    <head>
-      <meta charset="UTF-8" />
-
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-      <title id="aluno-titulo">Acompanhamento do Aluno</title>
-
-      <link rel="stylesheet" href="./css/main.css" />
-
-      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-      <link rel="icon" type="image/png" href="/imagem/jjj.jpg" />
-
-      <style>
-        /* CSS Mantido para o layout e tabs */
-        body {
-          padding: 0 10px;
-        }
-        header h1 {
-          font-size: 1.5em;
-        }
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title id="aluno-titulo">Acompanhamento do Aluno</title>
+    <link rel="stylesheet" href="./css/main.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="icon" type="image/png" href="/imagem/jjj.jpg" />
+    <style>
+      body {
+        padding: 0 10px;
+      }
+      header h1 {
+        font-size: 1.5em;
+      }
+      nav a {
+        display: inline-block;
+        margin: 5px 10px;
+        font-size: 0.9em;
+      }
+      input,
+      textarea,
+      button {
+        font-size: 1em;
+        width: 100%;
+        margin-bottom: 8px;
+      }
+      button {
+        cursor: pointer;
+      }
+      .tabs {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .tab-button {
+        flex: 1 1 auto;
+        margin: 5px 2px;
+      }
+      .tab-content {
+        margin-top: 10px;
+        display: none;
+      }
+      .tab-content.active {
+        display: block;
+      }
+      .exercicio-item input {
+        width: 100%;
+        margin-bottom: 5px;
+      }
+      table {
+        width: 100%;
+        overflow-x: auto;
+        display: block;
+      }
+      table th,
+      table td {
+        white-space: nowrap;
+      }
+      @media (max-width: 600px) {
         nav a {
-          display: inline-block;
-          margin: 5px 10px;
-          font-size: 0.9em;
-        }
-        input,
-        textarea,
-        button {
-          font-size: 1em;
-          width: 100%;
-          margin-bottom: 8px;
-        }
-        button {
-          cursor: pointer;
-        }
-        .tabs {
-          display: flex;
-          flex-wrap: wrap;
+          display: block;
+          margin: 5px 0;
+          text-align: center;
         }
         .tab-button {
-          flex: 1 1 auto;
-          margin: 5px 2px;
+          flex: 1 1 100%;
         }
-        .tab-content {
-          margin-top: 10px;
-          display: none;
-          padding: 15px;
-          border-radius: 0 8px 8px 8px;
-          background-color: var(--background-card);
-          border: 1px solid var(--accent-light);
-        }
-        .tab-content.active {
-          display: block;
-        }
-        .exercicio-item {
-          border: 1px solid var(--separator);
-          padding: 10px;
-          margin-bottom: 10px;
-          border-radius: 6px;
-          border-left: 5px solid var(--primary-color);
-        }
-        .exercicio-item h4 {
-          margin-top: 0;
-        }
-        .exercicio-item input,
-        .exercicio-item textarea {
-          width: 95%;
-        }
-        table {
-          width: 100%;
-          overflow-x: auto;
-          display: block;
-        }
-        table th,
-        table td {
-          white-space: nowrap;
-        }
-        @media (max-width: 600px) {
-          nav a {
-            display: block;
-            margin: 5px 0;
-            text-align: center;
-          }
-          .tab-button {
-            flex: 1 1 100%;
-          }
-        }
-      </style>
-    </head>
+      }
+    </style>
+  </head>
 
-    <body>
-      <header>
-        <h1>Jorlan de Araujo</h1>
+  <body>
+    <header>
+      <h1>Jorlan de Araujo</h1>
+      <nav>
+        <a href="index.html">Meus Alunos</a>
+        <a href="cadastro.html">Novo Aluno</a>
+      </nav>
+    </header>
 
-        <nav>
-          <a href="index.html">Meus Alunos</a>
-          <a href="cadastro.html">Novo Aluno</a>
-        </nav>
-      </header>
+    <main>
+      <h2 id="aluno-nome-header">Detalhes do Aluno</h2>
 
-      <main>
-        <h2 id="aluno-nome-header">Detalhes do Aluno</h2>
+      <div class="card">
+        <h3>Ficha e Treino (Editar)</h3>
+        <form id="form-edicao">
+          <input
+            type="text"
+            id="edit-nome"
+            placeholder="Nome Completo"
+            required
+          />
+          <input type="email" id="edit-email" placeholder="Email" />
+          <input type="number" id="edit-alturaCm" placeholder="Altura (cm)" />
+          <input type="text" id="edit-objetivo" placeholder="Objetivo" />
 
-        <div class="card">
-          <h3>Ficha e Treino (Editar)</h3>
+          <h4 style="color: var(--primary-color); margin-top: 20px">
+            Detalhes do Treino (Treino A, B, C...)
+          </h4>
+          <button type="submit">Salvar Dados</button>
+          <p id="msg-edicao" style="margin-top: 10px"></p>
+        </form>
 
-          <form id="form-edicao">
-            <input
-              type="text"
-              id="edit-nome"
-              placeholder="Nome Completo"
-              required
-            />
-            <input type="email" id="edit-email" placeholder="Email" />
-
-            <input type="number" id="edit-alturaCm" placeholder="Altura (cm)" />
-
-            <input type="text" id="edit-objetivo" placeholder="Objetivo" />
-
-            <h4 style="color: var(--primary-color); margin-top: 20px">
-              Detalhes Cadastrais
-            </h4>
-
-            <input type="hidden" id="edit-treinoJson" name="treinoJson" />
-
-            <button type="submit">Salvar Dados</button>
-            <p id="msg-edicao" style="margin-top: 10px"></p>
-          </form>
-
-          <h2>Divisão de Treino (A/B/C)</h2>
-
-          <div class="tabs">
-            <button class="tab-button active" data-tab="tab-a">
-              Treino A (Superiores - Puxar)
-            </button>
-
-            <button class="tab-button" data-tab="tab-b">
-              Treino B (Inferiores)
-            </button>
-
-            <button class="tab-button" data-tab="tab-c">
-              Treino C (Superiores - Empurrar)
-            </button>
-          </div>
-
-          <div id="tab-a" class="tab-content active">
-            <h3>Treino A - Superiores</h3>
-
-            <div class="exercicios-lista"></div>
-
-            <button class="add-exercicio-btn" data-target="tab-a">
-              Adicionar Exercício
-            </button>
-          </div>
-
-          <div id="tab-b" class="tab-content">
-            <h3>Treino B - Inferiores</h3>
-
-            <div class="exercicios-lista"></div>
-
-            <button class="add-exercicio-btn" data-target="tab-b">
-              Adicionar Exercício
-            </button>
-          </div>
-
-          <div id="tab-c" class="tab-content">
-            <h3>Treino C - Superiores</h3>
-
-            <div class="exercicios-lista"></div>
-
-            <button class="add-exercicio-btn" data-target="tab-c">
-              Adicionar Exercício
-            </button>
-          </div>
-
-          <button id="gerar-planilha-btn">
-            Baixar Planilha de Treino em PDF
+        <h2>Divisão de Treino (A/B/C)</h2>
+        <div class="tabs">
+          <button class="tab-button active" data-tab="tab-a">
+            Treino A (Superiores - Puxar)
+          </button>
+          <button class="tab-button" data-tab="tab-b">
+            Treino B (Inferiores)
+          </button>
+          <button class="tab-button" data-tab="tab-c">
+            Treino C (Superiores - Empurrar)
           </button>
         </div>
 
-        <div class="card">
-          <h3>Registrar Nova Evolução (Planilha de Entrada)</h3>
-
-          <form id="form-evolucao">
-            <input
-              type="number"
-              step="0.1"
-              id="peso"
-              placeholder="Peso (Kg)"
-              required
-            />
-
-            <input
-              type="number"
-              step="0.1"
-              id="gordura"
-              placeholder="% Gordura (Opcional)"
-            />
-
-            <textarea id="observacoes" placeholder="Observações"></textarea>
-            <button type="submit">Adicionar Registro</button>
-          </form>
-
-          <p id="msg-evolucao"></p>
+        <div id="tab-a" class="tab-content active">
+          <h3>Treino A - Superiores</h3>
+          <div class="exercicios-lista"></div>
+          <button class="add-exercicio-btn" data-target="tab-a">
+            Adicionar Exercício
+          </button>
+        </div>
+        <div id="tab-b" class="tab-content">
+          <h3>Treino B - Inferiores</h3>
+          <div class="exercicios-lista"></div>
+          <button class="add-exercicio-btn" data-target="tab-b">
+            Adicionar Exercício
+          </button>
+        </div>
+        <div id="tab-c" class="tab-content">
+          <h3>Treino C - Superiores</h3>
+          <div class="exercicios-lista"></div>
+          <button class="add-exercicio-btn" data-target="tab-c">
+            Adicionar Exercício
+          </button>
         </div>
 
-        <div class="card">
-          <h3>Gráficos e Histórico de Acompanhamento</h3>
+        <button id="gerar-planilha-btn">
+          Baixar Planilha de Treino em PDF
+        </button>
+      </div>
 
-          <div class="grafico-container">
-            <canvas id="grafico-evolucao" style="max-height: 400px"></canvas>
-          </div>
+      <div class="card">
+        <h3>Registrar Nova Evolução (Planilha de Entrada)</h3>
+        <form id="form-evolucao">
+          <input
+            type="number"
+            step="0.1"
+            id="peso"
+            placeholder="Peso (Kg)"
+            required
+          />
+          <input
+            type="number"
+            step="0.1"
+            id="gordura"
+            placeholder="% Gordura (Opcional)"
+          />
+          <textarea id="observacoes" placeholder="Observações"></textarea>
+          <button type="submit">Adicionar Registro</button>
+        </form>
+        <p id="msg-evolucao"></p>
+      </div>
 
-          <h4 style="margin-top: 20px; color: var(--primary-color)">
-            Histórico Detalhado
-          </h4>
-
-          <table id="tabela-historico">
-            <thead>
-              <tr>
-                <th>Data</th>
-
-                <th>Peso (Kg)</th>
-
-                <th>% Gordura</th>
-
-                <th>Observações</th>
-
-                <th>Ação</th>
-              </tr>
-            </thead>
-
-            <tbody></tbody>
-          </table>
+      <div class="card">
+        <h3>Gráficos e Histórico de Acompanhamento</h3>
+        <div class="grafico-container">
+          <canvas id="grafico-evolucao" style="max-height: 400px"></canvas>
         </div>
-      </main>
+        <h4 style="margin-top: 20px; color: var(--primary-color)">
+          Histórico Detalhado
+        </h4>
+        <table id="tabela-historico">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Peso (Kg)</th>
+              <th>% Gordura</th>
+              <th>Observações</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </main>
 
-      <script>
-        let treinoEstruturado = {};
-        const API_URL = "https://app-jorlan.onrender.com/api/alunos";
-        const alunoId = new URLSearchParams(window.location.search).get("id");
-        let alunoData = null,
-          chartInstance = null;
+    <script>
+      const API_URL = "https://app-jorlan.onrender.com/api/alunos";
+      const alunoId = new URLSearchParams(window.location.search).get("id");
+      let alunoData = null,
+        chartInstance = null;
 
-        const formatarData = (iso) => new Date(iso).toLocaleDateString("pt-BR");
+      const formatarData = (iso) => new Date(iso).toLocaleDateString("pt-BR");
 
-        // ----------------------------------------------------
-        // FUNÇÕES DE TREINO DINÂMICO
-        // ----------------------------------------------------
-
-        const createExercicioHTML = (tabId, count, data = {}) => {
-          const uid = `${tabId}-ex-${Date.now()}-${count}`;
-          const exName = data.nome || "";
-          const exSeries = data.series || "3";
-          const exReps = data.repeticoes || "10-12";
-          const exCarga = data.carga || "";
-          const exIntervalo = data.intervaloSeg || "60";
-          const exObs = data.observacoes || "";
-
-          return `<div class="exercicio-item" data-unique-id="${uid}">
-                <div class="exercicio-header">
-                    <h4>Exercício ${count}: ${exName}</h4>
-                    <button type="button" class="remover-exercicio-btn" data-id="${uid}" style="float:right;">Remover</button>
-                </div>
-                <label>Nome do Exercício:</label><input type="text" class="input-nome" value="${exName}" placeholder="Ex: Supino Reto" data-field="nome">
-                <label>Séries:</label><input type="number" class="input-series" value="${exSeries}" min="1" data-field="series">
-                <label>Repetições:</label><input type="text" class="input-reps" value="${exReps}" placeholder="Ex: 10-12" data-field="repeticoes">
-                <label>Carga (Opcional):</label><input type="text" class="input-carga" value="${exCarga}" placeholder="Ex: 20kg (cada lado)" data-field="carga">
-                <label>Intervalo (seg):</label><input type="number" class="input-intervalo" value="${exIntervalo}" min="10" data-field="intervaloSeg">
-                <label>Observação/Técnica:</label><textarea class="input-obs" placeholder="Ex: Cadência 3-1-1; Falha Concêntrica" data-field="observacoes">${exObs}</textarea>
-            </div>`;
-        };
-
-        function coletarDadosDasTabs() {
-          const dadosColetados = {};
-          const tabs = ["tab-a", "tab-b", "tab-c"];
-
-          tabs.forEach((tabId) => {
-            const lista = document.querySelector(`#${tabId} .exercicios-lista`);
-            const exerciciosDOM = lista.querySelectorAll(".exercicio-item");
-
-            dadosColetados[tabId] = Array.from(exerciciosDOM)
-              .map((item) => {
-                return {
-                  nome: item.querySelector(".input-nome").value,
-                  series:
-                    parseInt(item.querySelector(".input-series").value) || 0,
-                  repeticoes: item.querySelector(".input-reps").value,
-                  carga: item.querySelector(".input-carga").value,
-                  intervaloSeg:
-                    parseInt(item.querySelector(".input-intervalo").value) || 0,
-                  observacoes: item.querySelector("textarea").value,
-                };
-              })
-              .filter((ex) => ex.nome);
+      async function deletarRegistro(evolucaoId) {
+        if (
+          !confirm("Tem certeza que deseja deletar este registro de evolução?")
+        )
+          return;
+        try {
+          const response = await fetch(`${API_URL}/evolucao/${evolucaoId}`, {
+            method: "DELETE",
           });
-          return dadosColetados;
-        }
-
-        function renderizarTreinoEstruturado(treinoJson) {
-          const tabs = ["tab-a", "tab-b", "tab-c"];
-          try {
-            const dadosTreino = JSON.parse(treinoJson);
-            treinoEstruturado = dadosTreino;
-
-            tabs.forEach((tabId) => {
-              const lista = document.querySelector(
-                `#${tabId} .exercicios-lista`
-              );
-              lista.innerHTML = "";
-
-              if (dadosTreino[tabId] && Array.isArray(dadosTreino[tabId])) {
-                dadosTreino[tabId].forEach((exercicio, index) => {
-                  lista.insertAdjacentHTML(
-                    "beforeend",
-                    createExercicioHTML(tabId, index + 1, exercicio)
-                  );
-                });
-              }
-            });
-          } catch (e) {
-            console.error("Erro ao carregar ou renderizar JSON do treino:", e);
-            // Inicia os campos vazios em caso de erro
+          if (response.ok) {
+            alert("Registro deletado com sucesso!");
+            carregarDados();
+          } else {
+            const error = await response.json();
+            alert(`Falha ao deletar: ${error.error}`);
           }
+        } catch {
+          alert("Erro de conexão ao deletar registro.");
         }
+      }
+      window.deletarRegistro = deletarRegistro;
 
-        // ----------------------------------------------------
-        // FUNÇÕES DE CARREGAMENTO E AJAX
-        // ----------------------------------------------------
+      async function carregarDados() {
+        if (!alunoId) return;
+        try {
+          const response = await fetch(`${API_URL}/${alunoId}`);
+          alunoData = await response.json();
+          if (alunoData.error) throw new Error(alunoData.error);
 
-        async function deletarRegistro(evolucaoId) {
-          if (
-            !confirm(
-              "Tem certeza que deseja deletar este registro de evolução?"
-            )
-          )
-            return;
+          document.getElementById(
+            "aluno-titulo"
+          ).textContent = `Acompanhamento de ${alunoData.nome}`;
+          document.getElementById("aluno-nome-header").textContent =
+            alunoData.nome;
+          document.getElementById("edit-nome").value = alunoData.nome || "";
+          document.getElementById("edit-email").value = alunoData.email || "";
+          document.getElementById("edit-alturaCm").value =
+            alunoData.alturaCm || "";
+          document.getElementById("edit-objetivo").value =
+            alunoData.objetivo || "";
+          document.getElementById("edit-treinoHtml").value =
+            alunoData.treinoHtml || "";
+
+          renderizarTabela(alunoData.evolucao);
+          renderizarGrafico(alunoData.evolucao);
+        } catch (error) {
+          document.getElementById(
+            "aluno-nome-header"
+          ).textContent = `Erro ao carregar dados: ${error.message}`;
+        }
+      }
+
+      function renderizarGrafico(evolucao) {
+        if (chartInstance) chartInstance.destroy();
+        const datas = evolucao.map((e) => formatarData(e.dataRegistro));
+        const pesos = evolucao.map((e) => e.pesoKg);
+        const gordura = evolucao.map((e) => e.percGordura);
+        const ctx = document
+          .getElementById("grafico-evolucao")
+          .getContext("2d");
+        chartInstance = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: datas,
+            datasets: [
+              {
+                label: "Peso (Kg)",
+                data: pesos,
+                borderColor: "rgb(75,192,192)",
+                tension: 0.3,
+                fill: false,
+                pointRadius: 6,
+              },
+              {
+                label: "% Gordura",
+                data: gordura,
+                borderColor: "rgb(255,99,132)",
+                tension: 0.3,
+                hidden: true,
+                fill: false,
+                borderDash: [5, 5],
+              },
+            ],
+          },
+          options: { responsive: true },
+        });
+      }
+
+      function renderizarTabela(evolucao) {
+        const tbody = document.querySelector("#tabela-historico tbody");
+        tbody.innerHTML = "";
+        [...evolucao].reverse().forEach((e) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${formatarData(e.dataRegistro)}</td>
+                          <td>${e.pesoKg.toFixed(1)} Kg</td>
+                          <td>${
+                            e.percGordura ? e.percGordura.toFixed(1) + "%" : "-"
+                          }</td>
+                          <td>${e.observacoes || "-"}</td>
+                          <td><button onclick="deletarRegistro('${
+                            e.id
+                          }')" style="padding:5px 10px; background-color:#ff0000; color:white; border-radius:4px; border:none; cursor:pointer;">X</button></td>`;
+          tbody.appendChild(tr);
+        });
+      }
+
+      document
+        .getElementById("form-edicao")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const msg = document.getElementById("msg-edicao");
+          const dados = {
+            nome: document.getElementById("edit-nome").value,
+            email: document.getElementById("edit-email").value,
+            alturaCm: document.getElementById("edit-alturaCm").value,
+            objetivo: document.getElementById("edit-objetivo").value,
+            treinoHtml: document.getElementById("edit-treinoHtml").value,
+          };
           try {
-            const response = await fetch(`${API_URL}/evolucao/${evolucaoId}`, {
-              method: "DELETE",
+            const response = await fetch(`${API_URL}/${alunoId}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(dados),
             });
             if (response.ok) {
-              alert("Registro deletado com sucesso!");
+              msg.textContent = "Ficha e Treino salvos com sucesso!";
+              msg.style.color = "green";
               carregarDados();
             } else {
-              const error = await response.json();
-              alert(`Falha ao deletar: ${error.error}`);
+              msg.textContent = `Falha ao salvar ficha. Erro: ${response.status}`;
+              msg.style.color = "red";
             }
           } catch {
-            alert("Erro de conexão ao deletar registro.");
+            msg.textContent = "Erro de conexão (PUT).";
+            msg.style.color = "red";
           }
-        }
-        window.deletarRegistro = deletarRegistro;
-
-        async function carregarDados() {
-          if (!alunoId) return;
-          try {
-            const response = await fetch(`${API_URL}/${alunoId}`);
-            alunoData = await response.json();
-            if (alunoData.error) throw new Error(alunoData.error);
-
-            document.getElementById(
-              "aluno-titulo"
-            ).textContent = `Acompanhamento de ${alunoData.nome}`;
-            document.getElementById("aluno-nome-header").textContent =
-              alunoData.nome;
-
-            // ✅ PREENCHE FICHA
-            document.getElementById("edit-nome").value = alunoData.nome || "";
-            document.getElementById("edit-email").value = alunoData.email || "";
-            document.getElementById("edit-alturaCm").value =
-              alunoData.alturaCm || "";
-            document.getElementById("edit-objetivo").value =
-              alunoData.objetivo || "";
-            // ✅ CARREGA A ESTRUTURA DINÂMICA DO TREINO
-            renderizarTreinoEstruturado(alunoData.treinoHtml);
-
-            // ✅ RENDERIZA OS DADOS
-            renderizarTabela(alunoData.evolucao);
-            renderizarGrafico(alunoData.evolucao); // Chama o gráfico com dados
-          } catch (error) {
-            document.getElementById(
-              "aluno-nome-header"
-            ).textContent = `Erro ao carregar dados: ${error.message}`;
-          }
-        }
-
-        function renderizarGrafico(evolucao) {
-          // Se a evolução estiver vazia, não tenta renderizar o gráfico
-          if (!evolucao || evolucao.length === 0) {
-            if (chartInstance) chartInstance.destroy();
-            return;
-          }
-
-          // Garante que os valores sejam numéricos para o gráfico
-          const datas = evolucao.map((e) => formatarData(e.dataRegistro));
-          const pesos = evolucao.map((e) => parseFloat(e.pesoKg));
-          const gordura = evolucao.map((e) => parseFloat(e.percGordura));
-
-          const ctx = document
-            .getElementById("grafico-evolucao")
-            .getContext("2d");
-
-          if (chartInstance) chartInstance.destroy();
-
-          chartInstance = new Chart(ctx, {
-            type: "line",
-            data: {
-              labels: datas,
-              datasets: [
-                {
-                  label: "Peso (Kg)",
-                  data: pesos,
-                  borderColor: "rgb(75,192,192)",
-                  tension: 0.3,
-                  fill: false,
-                  pointRadius: 6,
-                },
-                {
-                  label: "% Gordura",
-                  data: gordura,
-                  borderColor: "rgb(255,99,132)",
-                  tension: 0.3,
-                  hidden: true,
-                  fill: false,
-                  borderDash: [5, 5],
-                },
-              ],
-            },
-            options: {
-              responsive: true,
-              scales: {
-                y: {
-                  beginAtZero: false,
-                },
-              },
-              plugins: {
-                title: {
-                  display: true,
-                  text: "Acompanhamento de Peso e % de Gordura",
-                },
-              },
-            },
-          });
-        }
-
-        function renderizarTabela(evolucao) {
-          const tbody = document.querySelector("#tabela-historico tbody");
-          tbody.innerHTML = "";
-          [...evolucao].reverse().forEach((e) => {
-            const tr = document.createElement("tr");
-            // Garante que os números sejam formatados corretamente para exibição
-            const pesoFormatado = parseFloat(e.pesoKg).toFixed(1);
-            const gorduraFormatada = e.percGordura
-              ? parseFloat(e.percGordura).toFixed(1) + "%"
-              : "-";
-
-            tr.innerHTML = `<td>${formatarData(e.dataRegistro)}</td>
-                              <td>${pesoFormatado} Kg</td>
-                              <td>${gorduraFormatada}</td>
-                              <td>${e.observacoes || "-"}</td>
-                              <td><button onclick="deletarRegistro('${
-                                e.id
-                              }')" style="padding:5px 10px; background-color:#ff0000; color:white; border-radius:4px; border:none; cursor:pointer;">X</button></td>`;
-            tbody.appendChild(tr);
-          });
-        }
-
-        // ATUALIZAÇÃO DO ALUNO (PUT) - Salva JSON Formatado
-
-        document
-          .getElementById("form-edicao")
-          .addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const msg = document.getElementById("msg-edicao");
-
-            // 1. Coleta dados da ficha
-            const dadosFicha = {
-              nome: document.getElementById("edit-nome").value,
-              email: document.getElementById("edit-email").value,
-              alturaCm: document.getElementById("edit-alturaCm").value,
-              objetivo: document.getElementById("edit-objetivo").value,
-            };
-
-            // 2. Coleta dados estruturados das Tabs
-            const dadosTreinoEstruturado = coletarDadosDasTabs();
-
-            // 3. Monta payload final (Treino Estruturado é salvo como STRING no treinoHtml)
-            const dadosParaEnviar = {
-              ...dadosFicha,
-              treinoHtml: JSON.stringify(dadosTreinoEstruturado),
-            };
-
-            try {
-              const response = await fetch(`${API_URL}/${alunoId}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(dadosParaEnviar),
-              });
-
-              if (response.ok) {
-                msg.textContent = "Ficha e Treino salvos com sucesso!";
-                msg.style.color = "green";
-                carregarDados();
-              } else {
-                msg.textContent = `Falha ao salvar ficha. Erro: ${response.status}`;
-                msg.style.color = "red";
-              }
-            } catch (error) {
-              msg.textContent = "Erro de conexão (PUT).";
-              msg.style.color = "red";
-            }
-          });
-
-        // Novo registro de evolução (POST)
-
-        document
-          .getElementById("form-evolucao")
-          .addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const msg = document.getElementById("msg-evolucao");
-            const pesoInput = document.getElementById("peso");
-            const gorduraInput = document.getElementById("gordura");
-            const obsInput = document.getElementById("observacoes");
-
-            const pesoKg = pesoInput.value;
-            const percGordura = gorduraInput.value || null;
-            const observacoes = obsInput.value;
-
-            if (!pesoKg) {
-              msg.textContent = "Por favor, preencha o campo Peso (Kg).";
-              msg.style.color = "red";
-              return;
-            }
-
-            const dadosEvolucao = {
-              alunoId: alunoId,
-              pesoKg: parseFloat(pesoKg),
-              percGordura: percGordura ? parseFloat(percGordura) : null,
-              observacoes: observacoes,
-            };
-
-            try {
-              const response = await fetch(`${API_URL}/evolucao`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(dadosEvolucao),
-              });
-
-              if (response.ok) {
-                msg.textContent =
-                  "Registro de evolução adicionado com sucesso!";
-                msg.style.color = "green";
-                pesoInput.value = "";
-                gorduraInput.value = "";
-                obsInput.value = "";
-                carregarDados(); // Recarrega os dados para atualizar tabela e gráfico
-              } else {
-                msg.textContent = `Falha ao adicionar registro. Erro: ${response.status}`;
-                msg.style.color = "red";
-              }
-            } catch (error) {
-              msg.textContent = "Erro de conexão (POST).";
-              msg.style.color = "red";
-            }
-          });
-
-        // Lógica de Inicialização
-
-        document.addEventListener("DOMContentLoaded", () => {
-          // Lógica de Tabs e botões (Mantida)
-          const tabButtons = document.querySelectorAll(".tab-button");
-          const tabContents = document.querySelectorAll(".tab-content");
-          const exercicioCounts = { "tab-a": 0, "tab-b": 0, "tab-c": 0 };
-          tabButtons.forEach((btn) =>
-            btn.addEventListener("click", () => {
-              const targetId = btn.getAttribute("data-tab");
-              tabButtons.forEach((b) => b.classList.remove("active"));
-              tabContents.forEach((c) => c.classList.remove("active"));
-              btn.classList.add("active");
-              document.getElementById(targetId).classList.add("active");
-            })
-          );
-
-          document.querySelectorAll(".add-exercicio-btn").forEach((btn) =>
-            btn.addEventListener("click", (e) => {
-              const tabId = e.target.getAttribute("data-target");
-              exercicioCounts[tabId]++;
-              const lista = document.querySelector(
-                `#${tabId} .exercicios-lista`
-              );
-              lista.insertAdjacentHTML(
-                "beforeend",
-                createExercicioHTML(tabId, exercicioCounts[tabId])
-              );
-            })
-          );
-
-          document.body.addEventListener("click", (e) => {
-            if (e.target.classList.contains("remover-exercicio-btn")) {
-              const el = e.target.closest(".exercicio-item");
-              if (el) el.remove();
-            }
-          });
-
-          // ✅ CHAMADA PRINCIPAL AQUI: Garante que os listeners estejam prontos
-          carregarDados();
         });
 
-        // Código de jspdf/html2canvas (Não é mais usado no fluxo principal de PDF)
-      </script>
-    </body>
-  </html>
-  Gráfico do backend não aparece: qual pode ser o problema? - Manus</canvas
->
+      document
+        .getElementById("form-evolucao")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const msg = document.getElementById("msg-evolucao");
+          const dados = {
+            pesoKg: document.getElementById("peso").value,
+            percGordura: document.getElementById("gordura").value,
+            observacoes: document.getElementById("observacoes").value,
+          };
+          try {
+            const response = await fetch(`${API_URL}/${alunoId}/evolucao`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(dados),
+            });
+            if (response.ok) {
+              msg.textContent = "Registro de evolução adicionado com sucesso!";
+              msg.style.color = "green";
+              document.getElementById("form-evolucao").reset();
+              carregarDados();
+            } else {
+              msg.textContent = `Erro ao registrar evolução. Erro: ${response.status}`;
+              msg.style.color = "red";
+            }
+          } catch {
+            msg.textContent = "Erro de conexão (POST).";
+            msg.style.color = "red";
+          }
+        });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const tabButtons = document.querySelectorAll(".tab-button");
+        const tabContents = document.querySelectorAll(".tab-content");
+        tabButtons.forEach((btn) =>
+          btn.addEventListener("click", () => {
+            const targetId = btn.getAttribute("data-tab");
+            tabButtons.forEach((b) => b.classList.remove("active"));
+            tabContents.forEach((c) => c.classList.remove("active"));
+            btn.classList.add("active");
+            document.getElementById(targetId).classList.add("active");
+          })
+        );
+
+        const addExercicioBtns =
+          document.querySelectorAll(".add-exercicio-btn");
+        const exercicioCounts = { "tab-a": 0, "tab-b": 0, "tab-c": 0 };
+        const createExercicioHTML = (tabId) => {
+          exercicioCounts[tabId]++;
+          const count = exercicioCounts[tabId];
+          const uid = `${tabId}-ex-${count}`;
+          return `<div class="exercicio-item" data-unique-id="${uid}">
+            <div class="exercicio-header"><h4>Exercício ${count}</h4>
+            <button type="button" class="remover-exercicio-btn" data-id="${uid}">Remover</button></div>
+            <label>Nome do Exercício:</label><input type="text" placeholder="Ex: Agachamento Livre, Supino Reto, Remada Curvada">
+            <label>Séries:</label><input type="number" value="3" min="1" style="width: 60px; display: inline-block;">
+            <label>Repetições:</label><input type="text" value="10-12" placeholder="Ex: 8-12 ou 10 Reps">
+            <label>Carga (Opcional):</label><input type="text" placeholder="Ex: 20kg (cada lado)">
+            <label>Intervalo (seg):</label><input type="number" value="60" min="10" style="width: 60px; display: inline-block;">
+            <label>Observação/Técnica:</label><input type="text" placeholder="Ex: Cadência 3-1-1; Falha Concêntrica">
+          </div>`;
+        };
+        addExercicioBtns.forEach((btn) =>
+          btn.addEventListener("click", (e) => {
+            const tabId = e.target.getAttribute("data-target");
+            const lista = document.querySelector(`#${tabId} .exercicios-lista`);
+            lista.insertAdjacentHTML("beforeend", createExercicioHTML(tabId));
+          })
+        );
+
+        document.body.addEventListener("click", (e) => {
+          if (e.target.classList.contains("remover-exercicio-btn")) {
+            const uid = e.target.getAttribute("data-id");
+            const el = document.querySelector(
+              `.exercicio-item[data-unique-id="${uid}"]`
+            );
+            if (el) el.remove();
+          }
+        });
+
+        document
+          .getElementById("gerar-planilha-btn")
+          .addEventListener("click", async () => {
+            const { jsPDF } = window.jspdf;
+            const conteudo = document.querySelector("main");
+            const canvas = await html2canvas(conteudo, { scale: 2 });
+            const imgData = canvas.toDataURL("image/png");
+            const pdf = new jsPDF("p", "mm", "a4");
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const imgHeight = (canvas.height * pageWidth) / canvas.width;
+            let heightLeft = imgHeight,
+              y = 0;
+            while (heightLeft > 0) {
+              pdf.addImage(imgData, "PNG", 0, y, pageWidth, imgHeight);
+              heightLeft -= pageHeight;
+              if (heightLeft > 0) {
+                pdf.addPage();
+                y -= pageHeight;
+              }
+            }
+            const nomeAluno =
+              document.getElementById("edit-nome").value || "treino";
+            pdf.save(`${nomeAluno}_planilha_treino.pdf`);
+          });
+      });
+
+      carregarDados();
+    </script>
+  </body>
+</html>
