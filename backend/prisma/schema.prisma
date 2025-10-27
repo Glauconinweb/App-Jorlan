@@ -1,32 +1,32 @@
 // prisma/schema.prisma
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
 }
 
 model Aluno {
-  id              String      @id @default(auto()) @map("_id") @db.ObjectId 
-  nome            String
-  email           String? 
-  alturaCm        Int?        
-  objetivo        String?  
-  treinoHtml      String?   
-  dataCadastro    DateTime    @default(now())
-  evolucao        Evolucao[]
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId 
+  nome            String
+  email           String?  // Opcional
+  alturaCm        Int?        
+  objetivo        String?  
+  treinoHtml      String?   // ✅ CAMPO PARA OS TREINOS A, B, C...
+  dataCadastro    DateTime    @default(now())
+  evolucao        Evolucao[]
 }
 
 model Evolucao {
-  id              String      @id @default(auto()) @map("_id") @db.ObjectId 
-  dataRegistro    DateTime    @default(now())
-  pesoKg          Float
-  percGordura     Float?
-  observacoes     String?
-  
-  alunoId         String      @db.ObjectId
-  aluno           Aluno       @relation(fields: [alunoId], references: [id])
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId 
+  dataRegistro    DateTime    @default(now())
+  pesoKg          Float
+  percGordura     Float?
+  observacoes     String?
+  
+  alunoId         String      @db.ObjectId
+  aluno           Aluno       @relation(fields: [alunoId], references: [id])
 }

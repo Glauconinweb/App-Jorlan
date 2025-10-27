@@ -51,12 +51,14 @@
                  
           <input type="text" id="edit-objetivo" placeholder="Objetivo" />
 
+                   
           <h4 style="color: var(--primary-color); margin-top: 20px">
-            Detalhes do Treino (HTML Simples)
+                        Detalhes do Treino (Treino A, B, C...)          
           </h4>
+                   
           <textarea
             id="edit-treinoHtml"
-            placeholder="Digite aqui a estrutura do Treino A, Treino B, Treino C, usando quebras de linha. Este conteúdo irá diretamente para o PDF."
+            placeholder="Digite aqui a estrutura do Treino A, Treino B, Treino C, etc."
             rows="8"
           ></textarea>
 
@@ -136,6 +138,7 @@
               <th>% Gordura</th>
                            
               <th>Observações</th>
+              <th>Ação</th>
                          
             </tr>
                      
@@ -159,6 +162,31 @@
       const formatarData = (isoString) =>
         new Date(isoString).toLocaleDateString("pt-BR");
 
+      // ✅ FUNÇÃO DE DELEÇÃO
+      async function deletarRegistro(evolucaoId) {
+        if (
+          !confirm("Tem certeza que deseja deletar este registro de evolução?")
+        )
+          return;
+
+        try {
+          // Rota DELETE: /api/alunos/evolucao/[ID]
+          const deleteUrl = `${API_URL}/evolucao/${evolucaoId}`;
+          const response = await fetch(deleteUrl, { method: "DELETE" });
+
+          if (response.ok) {
+            alert("Registro deletado com sucesso!");
+            carregarDados(); // Recarrega a página para atualizar
+          } else {
+            const error = await response.json();
+            alert(`Falha ao deletar: ${error.error}`);
+          }
+        } catch (error) {
+          alert("Erro de conexão ao deletar registro.");
+        }
+      }
+      window.deletarRegistro = deletarRegistro; // Torna a função global para o onclick
+
       async function carregarDados() {
         if (!alunoId) return;
         try {
@@ -170,7 +198,7 @@
             "aluno-titulo"
           ).textContent = `Acompanhamento de ${alunoData.nome}`;
           document.getElementById("aluno-nome-header").textContent =
-            alunoData.nome; // Preenche formulário de Edição
+            alunoData.nome;
 
           document.getElementById("edit-nome").value = alunoData.nome || "";
           document.getElementById("edit-email").value = alunoData.email || "";
@@ -178,9 +206,8 @@
             alunoData.alturaCm || "";
           document.getElementById("edit-objetivo").value =
             alunoData.objetivo || "";
-          // ✅ NOVO: Preenche o campo de Treino com o HTML salvo
           document.getElementById("edit-treinoHtml").value =
-            alunoData.treinoHtml || ""; // Configura link de download PDF
+            alunoData.treinoHtml || ""; // Preenche Treino
 
           document.getElementById(
             "btn-download-pdf"
@@ -196,6 +223,7 @@
       }
 
       function renderizarGrafico(evolucao) {
+        // ... (lógica de gráfico) ...
         if (chartInstance) chartInstance.destroy();
         const datas = evolucao.map((e) => formatarData(e.dataRegistro));
         const pesos = evolucao.map((e) => e.pesoKg);
@@ -245,6 +273,9 @@
             <td>${e.pesoKg.toFixed(1)} Kg</td>
             <td>${e.percGordura ? e.percGordura.toFixed(1) + "%" : "-"}</td>
             <td>${e.observacoes || "-"}</td>
+                         <td><button onclick="deletarRegistro('${
+               e.id
+             }')" style="padding: 5px 10px; background-color: #ff0000; color: white; border-radius: 4px; border: none; cursor: pointer;">X</button></td>
           `;
           tbody.appendChild(tr);
         });
@@ -260,7 +291,6 @@
             email: document.getElementById("edit-email").value,
             alturaCm: document.getElementById("edit-alturaCm").value,
             objetivo: document.getElementById("edit-objetivo").value,
-            // ✅ NOVO: Puxa o conteúdo do Treino para o PUT
             treinoHtml: document.getElementById("edit-treinoHtml").value,
           };
 
