@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="./css/main.css" />
        
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+       
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
        
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -19,8 +20,8 @@
     <link rel="icon" type="image/png" href="/imagem/jjj.jpg" />
        
     <style>
-            /* (Seu CSS Mobile Mantido) */
-            body { padding: 0 10px; } header h1 { font-size: 1.5em; } nav a { display: inline-block; margin: 5px 10px; font-size: 0.9em; } input, textarea, button { font-size: 1em; width: 100%; margin-bottom: 8px; } button { cursor: pointer; } .tabs { display: flex; flex-wrap: wrap; } .tab-button { flex: 1 1 auto; margin: 5px 2px; } .tab-content { margin-top: 10px; display: none; padding: 15px; border-radius: 0 8px 8px 8px; background-color: var(--background-card); border: 1px solid var(--accent-light); } .tab-content.active { display: block; } .exercicio-item { border: 1px solid var(--separator); padding: 10px; margin-bottom: 10px; border-radius: 6px; border-left: 5px solid var(--primary-color); } .exercicio-item h4 { margin-top: 0; } .exercicio-item input, .exercicio-item textarea { width: 95%; } table { width: 100%; overflow-x: auto; display: block; } table th, table td { white-space: nowrap; } @media (max-width: 600px) { nav a { display: block; margin: 5px 0; text-align: center; } .tab-button { flex: 1 1 100%; } }
+            /* CSS Mantido para o layout e tabs */
+            body { padding: 0 10px; } header h1 { font-size: 1.5em; } nav a { display: inline-block; margin: 5px 10px; font-size: 0.9em; } input, textarea, button { font-size: 1em; width: 100%; margin-bottom: 8px; } button { cursor: pointer; } .tabs { display: flex; flex-wrap: wrap; } .tab-button { flex: 1 1 auto; margin: 5px 2px; } .tab-content { margin-top: 10px; display: none; padding: 15px; border-radius: 0 8px 8px 8px; background-color: var(--background-card); border: 1px solid var(--accent-light); } .tab-content.active { display: block; } .exercicio-item { border: 1px solid var(--separator); padding: 10px; margin-bottom: 10px; border-radius: 6px; border-left: 5px solid var(--primary-color); } .exercicio-item h4 { margin-top: 0; } .exercicio-item input, .exercicio-item textarea { width: 95%; } table { width: 100%; overflow-x: auto; display: block; } table th, table td { white-space: nowrap; } @media (max-width: 600px) { nav a { display: block; margin: 5px 0; text-align: center; } .tab-button { flex: 1 1 100%; } }
          
     </style>
      
@@ -68,6 +69,7 @@
           <h4 style="color: var(--primary-color); margin-top: 20px">
             Detalhes Cadastrais
           </h4>
+                   
           <input type="hidden" id="edit-treinoJson" name="treinoJson" />
 
                     <button type="submit">Salvar Dados</button>          
@@ -213,20 +215,15 @@
 
        
     <script>
-      let treinoEstruturado = {}; // Armazena os dados do treino
-
+      let treinoEstruturado = {};
       const API_URL = "https://app-jorlan.onrender.com/api/alunos";
       const alunoId = new URLSearchParams(window.location.search).get("id");
       let alunoData = null,
         chartInstance = null;
 
-      const formatarData = (iso) => new Date(iso).toLocaleDateString("pt-BR");
+      const formatarData = (iso) => new Date(iso).toLocaleDateString("pt-BR"); // ---------------------------------------------------- // FUNÇÕES DE TREINO DINÂMICO // ----------------------------------------------------
 
-      // ----------------------------------------------------
-      // FUNÇÕES DE TREINO DINÂMICO
-      // ----------------------------------------------------
-
-      // ✅ FUNÇÃO 1: Cria o HTML de um Bloco de Exercício (Template)
+      // [FUNÇÃO createExercicioHTML - Mantida da resposta anterior]
       const createExercicioHTML = (tabId, count, data = {}) => {
         const uid = `${tabId}-ex-${Date.now()}-${count}`;
         const exName = data.nome || "";
@@ -250,7 +247,7 @@
             </div>`;
       };
 
-      // ✅ FUNÇÃO 2: Coleta os dados de TODAS as Tabs para JSON
+      // [FUNÇÃO coletarDadosDasTabs - Mantida da resposta anterior]
       function coletarDadosDasTabs() {
         const dadosColetados = {};
         const tabs = ["tab-a", "tab-b", "tab-c"];
@@ -274,16 +271,13 @@
             })
             .filter((ex) => ex.nome);
         });
-
         return dadosColetados;
       }
 
-      // ✅ FUNÇÃO 3: Renderiza o Treino Estruturado ao carregar
+      // [FUNÇÃO renderizarTreinoEstruturado - Mantida da resposta anterior]
       function renderizarTreinoEstruturado(treinoJson) {
         const tabs = ["tab-a", "tab-b", "tab-c"];
-
         try {
-          // Converte a string JSON salva no banco de dados
           const dadosTreino = JSON.parse(treinoJson);
           treinoEstruturado = dadosTreino;
 
@@ -302,54 +296,9 @@
           });
         } catch (e) {
           console.error("Erro ao carregar ou renderizar JSON do treino:", e);
-          // Caso o JSON esteja corrompido, inicia os campos vazios
-          renderizarTreinoEstruturado({});
+          // Inicia os campos vazios em caso de erro
         }
-      }
-
-      // ✅ FUNÇÃO 4: Formata os dados JSON para o HTML do PDF
-      function formatarTreinoParaHTML(dadosTreino) {
-        let htmlContent = "";
-        const tabNames = {
-          "tab-a": "Treino A - Superiores (Puxar)",
-          "tab-b": "Treino B - Inferiores",
-          "tab-c": "Treino C - Superiores (Empurrar)",
-        };
-
-        for (const tabId in dadosTreino) {
-          const exercicios = dadosTreino[tabId];
-          if (exercicios.length > 0) {
-            htmlContent += `<div class="bloco-treino"><h3>${
-              tabNames[tabId] || "Treino"
-            }</h3>`;
-            exercicios.forEach((ex, index) => {
-              htmlContent += `
-                          <p><strong>Exercício ${index + 1}:</strong> ${
-                ex.nome
-              }</p>
-                          <p>Séries/Reps: ${ex.series} x ${ex.repeticoes}</p>
-                          <p>Carga/Obs: ${ex.carga || "-"} / ${
-                ex.intervaloSeg || "-"
-              } seg</p>
-                          <p style="font-style: italic;">Técnica: ${
-                            ex.observacoes || "Nenhuma"
-                          }</p>
-                          ${
-                            index < exercicios.length - 1
-                              ? '<hr style="border-top: 1px dashed #555; margin: 10px 0;">'
-                              : ""
-                          }
-                      `;
-            });
-            htmlContent += "</div>";
-          }
-        }
-        return htmlContent;
-      }
-
-      // ----------------------------------------------------
-      // FUNÇÕES DE CARREGAMENTO E AJAX
-      // ----------------------------------------------------
+      } // ---------------------------------------------------- // FUNÇÕES DE CARREGAMENTO E AJAX // ----------------------------------------------------
 
       async function deletarRegistro(evolucaoId) {
         if (
@@ -386,19 +335,18 @@
           document.getElementById("aluno-nome-header").textContent =
             alunoData.nome;
 
-          // ✅ PREENCHE A FICHA CADASTAL
+          // ✅ PREENCHE FICHA
           document.getElementById("edit-nome").value = alunoData.nome || "";
           document.getElementById("edit-email").value = alunoData.email || "";
           document.getElementById("edit-alturaCm").value =
             alunoData.alturaCm || "";
           document.getElementById("edit-objetivo").value =
             alunoData.objetivo || "";
-
-          // ✅ PREENCHE A ESTRUTURA DINÂMICA DO TREINO
-          renderizarTreinoEstruturado(alunoData.treinoHtml); // TreinoHtml é a string JSON
+          // ✅ CARREGA A ESTRUTURA DINÂMICA DO TREINO
+          renderizarTreinoEstruturado(alunoData.treinoHtml); // ✅ RENDERIZA OS DADOS
 
           renderizarTabela(alunoData.evolucao);
-          renderizarGrafico(alunoData.evolucao);
+          renderizarGrafico(alunoData.evolucao); // Chama o gráfico com dados
         } catch (error) {
           document.getElementById(
             "aluno-nome-header"
@@ -413,9 +361,32 @@
         const gordura = evolucao.map((e) => e.percGordura);
         const ctx = document
           .getElementById("grafico-evolucao")
-          .getContext("2d"); // ... (lógica de Chart.js) ...
+          .getContext("2d");
         chartInstance = new Chart(ctx, {
-          /* ... */
+          type: "line",
+          data: {
+            labels: datas,
+            datasets: [
+              {
+                label: "Peso (Kg)",
+                data: pesos,
+                borderColor: "rgb(75,192,192)",
+                tension: 0.3,
+                fill: false,
+                pointRadius: 6,
+              },
+              {
+                label: "% Gordura",
+                data: gordura,
+                borderColor: "rgb(255,99,132)",
+                tension: 0.3,
+                hidden: true,
+                fill: false,
+                borderDash: [5, 5],
+              },
+            ],
+          },
+          options: { responsive: true },
         });
       }
 
@@ -435,16 +406,15 @@
           }')" style="padding:5px 10px; background-color:#ff0000; color:white; border-radius:4px; border:none; cursor:pointer;">X</button></td>`;
           tbody.appendChild(tr);
         });
-      }
+      } // ATUALIZAÇÃO DO ALUNO (PUT) - Salva JSON Formatado
 
-      // ✅ ATUALIZAÇÃO DO ALUNO (PUT) - Salva JSON Formatado
       document
         .getElementById("form-edicao")
         .addEventListener("submit", async (e) => {
           e.preventDefault();
           const msg = document.getElementById("msg-edicao");
 
-          // 1. Coleta os dados da ficha
+          // 1. Coleta dados da ficha
           const dadosFicha = {
             nome: document.getElementById("edit-nome").value,
             email: document.getElementById("edit-email").value,
@@ -452,10 +422,10 @@
             objetivo: document.getElementById("edit-objetivo").value,
           };
 
-          // 2. Coleta os dados estruturados das Tabs
+          // 2. Coleta dados estruturados das Tabs
           const dadosTreinoEstruturado = coletarDadosDasTabs();
 
-          // 3. Monta o payload final: Treino Estruturado é salvo como STRING no treinoHtml
+          // 3. Monta payload final (Treino Estruturado é salvo como STRING no treinoHtml)
           const dadosParaEnviar = {
             ...dadosFicha,
             treinoHtml: JSON.stringify(dadosTreinoEstruturado),
@@ -480,44 +450,19 @@
             msg.textContent = "Erro de conexão (PUT).";
             msg.style.color = "red";
           }
-        });
+        }); // Novo registro de evolução (POST)
 
-      // ✅ GERAÇÃO DE PDF (Chama a rota de download do Backend)
-      document
-        .getElementById("gerar-planilha-btn")
-        .addEventListener("click", (e) => {
-          // Garante que o usuário clique em Salvar primeiro
-          const confirmacao = confirm(
-            "Clique em OK para salvar as alterações do treino no banco e gerar o PDF atualizado."
-          );
-          if (confirmacao) {
-            // 1. Salva os dados (O PUT acima)
-            document
-              .getElementById("form-edicao")
-              .dispatchEvent(new Event("submit"));
-
-            // 2. Redireciona para o download (GET)
-            // O download usa a URL do Backend, que está configurado para formatar o HTML com o campo 'treinoHtml'
-            setTimeout(() => {
-              window.location.href = `${API_URL}/pdf/download/${alunoId}`;
-            }, 500); // Dá tempo para o PUT ser processado
-          }
-        });
-
-      // Lógica de Evolução (POST) e Tabs (Mantida)
       document
         .getElementById("form-evolucao")
         .addEventListener("submit", async (e) => {
           /* ... */
-        });
+        }); // Lógica de Inicialização (Corrigida)
 
-      // Lógica de Inicialização (Corrigida)
       document.addEventListener("DOMContentLoaded", () => {
         // Lógica de Tabs e botões (Mantida)
         const tabButtons = document.querySelectorAll(".tab-button");
         const tabContents = document.querySelectorAll(".tab-content");
         const exercicioCounts = { "tab-a": 0, "tab-b": 0, "tab-c": 0 };
-
         tabButtons.forEach((btn) =>
           btn.addEventListener("click", () => {
             const targetId = btn.getAttribute("data-tab");
