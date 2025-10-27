@@ -1,352 +1,233 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-   
   <head>
-       
     <meta charset="UTF-8" />
-       
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-       
-    <title id="aluno-titulo">Acompanhamento do Aluno</title>
-       
+    <title>Treinador Pro - Aluno</title>
     <link rel="stylesheet" href="/css/main.css" />
-       
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-     
+    <style>
+      /* Estilo do modal de adicionar treino */
+      #modal-treino {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      #modal-treino .modal-content {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      }
+
+      #modal-treino input,
+      #modal-treino textarea {
+        width: 100%;
+        margin-bottom: 10px;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      #modal-treino button {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      #modal-treino button:first-child {
+        background-color: #007bff;
+        color: white;
+      }
+
+      #modal-treino button:last-child {
+        background-color: #ccc;
+      }
+    </style>
   </head>
-   
+
   <body>
-       
     <header>
-           
       <h1>Treinador Pro</h1>
-           
       <nav>
-                <a href="index.html">Dashboard</a>        
-        <a href="cadastro.html">Novo Aluno</a>      
+        <a href="/">Dashboard</a>
+        <a href="/views/cadastro.html">Novo Aluno</a>
       </nav>
-         
     </header>
-       
+
     <main>
-           
-      <h2 id="aluno-nome-header">Detalhes do Aluno</h2>
-
-           
       <div class="card">
-               
-        <h3>Ficha e Treino (Editar)</h3>
-               
-        <form id="form-edicao">
-                   
-          <input
-            type="text"
-            id="edit-nome"
-            placeholder="Nome Completo"
-            required
-          />
-                    <input type="email" id="edit-email" placeholder="Email" />  
-                 
-          <input type="number" id="edit-alturaCm" placeholder="Altura (cm)" />  
-                 
-          <input type="text" id="edit-objetivo" placeholder="Objetivo" />
+        <h2>Ficha do Aluno</h2>
 
-                   
-          <h4 style="color: var(--primary-color); margin-top: 20px">
-                        Detalhes do Treino (Treino A, B, C...)          
-          </h4>
-                   
+        <div id="dados-aluno">
+          <p><strong>Nome:</strong> <span id="aluno-nome"></span></p>
+          <p><strong>Email:</strong> <span id="aluno-email"></span></p>
+          <p><strong>Altura:</strong> <span id="aluno-altura"></span> cm</p>
+          <p><strong>Objetivo:</strong> <span id="aluno-objetivo"></span></p>
+        </div>
+
+        <hr />
+
+        <h3>Planilha de Treino</h3>
+
+        <form id="form-edicao">
           <textarea
             id="edit-treinoHtml"
-            placeholder="Digite aqui a estrutura do Treino A, Treino B, Treino C, etc."
-            rows="8"
+            placeholder="Digite ou adicione blocos de treino..."
+            rows="10"
+            style="width: 100%; resize: vertical"
           ></textarea>
 
-                    <button type="submit">Salvar Ficha e Treino</button>        
-           
-          <p id="msg-edicao" style="margin-top: 10px"></p>
-                 
-        </form>
-             
-      </div>
+          <div style="margin-top: 10px">
+            <button
+              type="button"
+              onclick="abrirModalTreino()"
+              class="btn-acao"
+              style="background-color: #007bff; margin-right: 10px"
+            >
+              + Adicionar Bloco de Treino
+            </button>
 
-           
-      <div class="card">
-               
-        <h3>Registrar Nova Evolução (Planilha de Entrada)</h3>
-               
-        <form id="form-evolucao">
-                   
-          <input
-            type="number"
-            step="0.1"
-            id="peso"
-            placeholder="Peso (Kg)"
-            required
-          />
-                   
-          <input
-            type="number"
-            step="0.1"
-            id="gordura"
-            placeholder="% Gordura (Opcional)"
-          />
-                   
-          <textarea id="observacoes" placeholder="Observações"></textarea>      
-              <button type="submit">Adicionar Registro</button>          
-          <a
-            href="#"
-            id="btn-download-pdf"
-            class="btn-acao"
-            target="_blank"
-            style="margin-left: 10px"
-          >
-                        Baixar Relatório PDF          
-          </a>
-                 
+            <button
+              type="submit"
+              class="btn-acao"
+              style="background-color: #28a745"
+            >
+              Salvar Alterações
+            </button>
+          </div>
         </form>
-               
-        <p id="msg-evolucao"></p>
-             
-      </div>
 
-           
-      <div class="card">
-               
-        <h3>Gráficos e Histórico de Acompanhamento</h3>
-               
-        <div class="grafico-container">
-                   
-          <canvas id="grafico-evolucao" style="max-height: 400px"></canvas>    
-             
-        </div>
-               
-        <h4 style="margin-top: 20px; color: var(--primary-color)">
-                    Histórico Detalhado        
-        </h4>
-               
-        <table id="tabela-historico">
-                   
-          <thead>
-                       
-            <tr>
-                           
-              <th>Data</th>
-                           
-              <th>Peso (Kg)</th>
-                           
-              <th>% Gordura</th>
-                           
-              <th>Observações</th>
-              <th>Ação</th>
-                         
-            </tr>
-                     
-          </thead>
-                   
-          <tbody></tbody>
-                 
-        </table>
-             
+        <p id="msg-edicao" style="margin-top: 15px"></p>
       </div>
-         
     </main>
 
-       
+    <!-- MODAL DE ADICIONAR BLOCO -->
+    <div id="modal-treino">
+      <div class="modal-content">
+        <h3>Novo Bloco de Treino</h3>
+        <input
+          type="text"
+          id="treino-nome"
+          placeholder="Nome do Treino (Ex: Treino A)"
+        />
+        <textarea
+          id="treino-exercicios"
+          placeholder="Exercícios e observações"
+          rows="6"
+        ></textarea>
+        <div style="margin-top: 10px; text-align: right">
+          <button onclick="adicionarBlocoConfirmado()">Adicionar</button>
+          <button onclick="fecharModalTreino()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
     <script>
       const API_URL = "https://app-jorlan.onrender.com/api/alunos";
-      const alunoId = new URLSearchParams(window.location.search).get("id");
-      let alunoData = null;
-      let chartInstance = null;
 
-      const formatarData = (isoString) =>
-        new Date(isoString).toLocaleDateString("pt-BR"); // ✅ FUNÇÃO DE DELEÇÃO (Globalizada)
+      const params = new URLSearchParams(window.location.search);
+      const alunoId = params.get("id");
 
-      async function deletarRegistro(evolucaoId) {
-        if (
-          !confirm("Tem certeza que deseja deletar este registro de evolução?")
-        )
-          return;
-
+      async function carregarAluno() {
         try {
-          // Rota DELETE: /api/alunos/evolucao/[ID]
-          const deleteUrl = `${API_URL}/evolucao/${evolucaoId}`;
-          const response = await fetch(deleteUrl, { method: "DELETE" });
+          const res = await fetch(`${API_URL}/${alunoId}`);
+          if (!res.ok) throw new Error("Erro ao carregar aluno");
+          const aluno = await res.json();
 
-          if (response.ok) {
-            alert("Registro deletado com sucesso!");
-            carregarDados();
-          } else {
-            const error = await response.json();
-            alert(`Falha ao deletar: ${error.error}`);
-          }
-        } catch (error) {
-          alert("Erro de conexão ao deletar registro.");
-        }
-      }
-      window.deletarRegistro = deletarRegistro; // Torna a função global
-
-      async function carregarDados() {
-        if (!alunoId) return;
-        try {
-          const response = await fetch(`${API_URL}/${alunoId}`);
-          alunoData = await response.json();
-          if (alunoData.error) throw new Error(alunoData.error);
-
-          document.getElementById(
-            "aluno-titulo"
-          ).textContent = `Acompanhamento de ${alunoData.nome}`;
-          document.getElementById("aluno-nome-header").textContent =
-            alunoData.nome;
-
-          document.getElementById("edit-nome").value = alunoData.nome || "";
-          document.getElementById("edit-email").value = alunoData.email || "";
-          document.getElementById("edit-alturaCm").value =
-            alunoData.alturaCm || "";
-          document.getElementById("edit-objetivo").value =
-            alunoData.objetivo || "";
+          document.getElementById("aluno-nome").textContent = aluno.nome;
+          document.getElementById("aluno-email").textContent =
+            aluno.email || "-";
+          document.getElementById("aluno-altura").textContent =
+            aluno.alturaCm || "-";
+          document.getElementById("aluno-objetivo").textContent =
+            aluno.objetivo || "-";
           document.getElementById("edit-treinoHtml").value =
-            alunoData.treinoHtml || ""; // Preenche Treino
-
-          document.getElementById(
-            "btn-download-pdf"
-          ).href = `${API_URL}/pdf/download/${alunoId}`;
-
-          renderizarTabela(alunoData.evolucao);
-          renderizarGrafico(alunoData.evolucao);
+            aluno.treinoHtml || "";
         } catch (error) {
-          document.getElementById(
-            "aluno-nome-header"
-          ).textContent = `Erro ao carregar dados: ${error.message}`;
+          document.querySelector("main").innerHTML =
+            "<p>Erro ao carregar os dados do aluno.</p>";
         }
       }
-
-      function renderizarGrafico(evolucao) {
-        // ... (lógica de gráfico) ...
-        if (chartInstance) chartInstance.destroy();
-        const datas = evolucao.map((e) => formatarData(e.dataRegistro));
-        const pesos = evolucao.map((e) => e.pesoKg);
-        const gordura = evolucao.map((e) => e.percGordura);
-
-        const ctx = document
-          .getElementById("grafico-evolucao")
-          .getContext("2d");
-        chartInstance = new Chart(ctx, {
-          type: "line",
-          data: {
-            labels: datas,
-            datasets: [
-              {
-                label: "Peso (Kg)",
-                data: pesos,
-                borderColor: "rgb(75,192,192)",
-                tension: 0.3,
-                fill: false,
-                pointRadius: 6,
-                pointHoverRadius: 8,
-              },
-              {
-                label: "% Gordura",
-                data: gordura,
-                borderColor: "rgb(255,99,132)",
-                tension: 0.3,
-                hidden: true,
-                fill: false,
-                borderDash: [5, 5],
-              },
-            ],
-          },
-          options: { responsive: true },
-        });
-      }
-
-      function renderizarTabela(evolucao) {
-        const tbody = document
-          .getElementById("tabela-historico")
-          .querySelector("tbody");
-        tbody.innerHTML = "";
-        evolucao.reverse().forEach((e) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${formatarData(e.dataRegistro)}</td>
-            <td>${e.pesoKg.toFixed(1)} Kg</td>
-            <td>${e.percGordura ? e.percGordura.toFixed(1) + "%" : "-"}</td>
-            <td>${e.observacoes || "-"}</td>
-                         <td><button onclick="deletarRegistro('${
-            e.id
-          }')" style="padding: 5px 10px; background-color: #ff0000; color: white; border-radius: 4px; border: none; cursor: pointer;">X</button></td>
-          `;
-          tbody.appendChild(tr);
-        });
-      } // Atualização do aluno (PUT)
 
       document
         .getElementById("form-edicao")
         .addEventListener("submit", async (e) => {
           e.preventDefault();
           const msg = document.getElementById("msg-edicao");
-          const dados = {
-            nome: document.getElementById("edit-nome").value,
-            email: document.getElementById("edit-email").value,
-            alturaCm: document.getElementById("edit-alturaCm").value,
-            objetivo: document.getElementById("edit-objetivo").value,
-            treinoHtml: document.getElementById("edit-treinoHtml").value,
-          };
+          msg.textContent = "Salvando...";
+          msg.style.color = "black";
+
+          const treinoHtml = document.getElementById("edit-treinoHtml").value;
 
           try {
-            const response = await fetch(`${API_URL}/${alunoId}`, {
+            const res = await fetch(`${API_URL}/${alunoId}`, {
               method: "PUT",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(dados),
+              body: JSON.stringify({ treinoHtml }),
             });
-            if (response.ok) {
-              msg.textContent = "Ficha e Treino salvos com sucesso!";
+
+            if (res.ok) {
+              msg.textContent = "Treino atualizado com sucesso!";
               msg.style.color = "green";
-              carregarDados();
             } else {
-              msg.textContent = `Falha ao salvar ficha. Erro: ${response.status}`;
+              msg.textContent = "Erro ao salvar.";
               msg.style.color = "red";
             }
-          } catch (error) {
-            msg.textContent = "Erro de conexão (PUT).";
-            msg.style.color = "red";
-          }
-        }); // Novo registro de evolução (POST)
-
-      document
-        .getElementById("form-evolucao")
-        .addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const msg = document.getElementById("msg-evolucao");
-          const dados = {
-            pesoKg: document.getElementById("peso").value,
-            percGordura: document.getElementById("gordura").value,
-            observacoes: document.getElementById("observacoes").value,
-          };
-
-          try {
-            const response = await fetch(`${API_URL}/${alunoId}/evolucao`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(dados),
-            });
-            if (response.ok) {
-              msg.textContent = "Registro de evolução adicionado com sucesso!";
-              msg.style.color = "green";
-              document.getElementById("form-evolucao").reset();
-              carregarDados();
-            } else {
-              msg.textContent = `Erro ao registrar evolução. Erro: ${response.status}`;
-              msg.style.color = "red";
-            }
-          } catch (error) {
-            msg.textContent = "Erro de conexão (POST).";
+          } catch {
+            msg.textContent = "Erro de conexão com o servidor.";
             msg.style.color = "red";
           }
         });
 
-      carregarDados();
+      // ===== MODAL DE ADICIONAR TREINO =====
+      function abrirModalTreino() {
+        document.getElementById("modal-treino").style.display = "flex";
+      }
+
+      function fecharModalTreino() {
+        document.getElementById("modal-treino").style.display = "none";
+      }
+
+      function adicionarBlocoConfirmado() {
+        const nome = document.getElementById("treino-nome").value.trim();
+        const conteudo = document
+          .getElementById("treino-exercicios")
+          .value.trim();
+        if (!nome || !conteudo) {
+          alert("Preencha o nome do treino e os exercícios.");
+          return;
+        }
+
+        const textarea = document.getElementById("edit-treinoHtml");
+        const novoBloco = `
+<div class="bloco-treino">
+  <h3>${nome}</h3>
+  <p>${conteudo.replace(/\n/g, "<br>")}</p>
+</div>
+`;
+
+        textarea.value += novoBloco + "\n";
+        fecharModalTreino();
+
+        // Limpa inputs do modal
+        document.getElementById("treino-nome").value = "";
+        document.getElementById("treino-exercicios").value = "";
+
+        textarea.scrollTop = textarea.scrollHeight; // rola para o final
+      }
+
+      carregarAluno();
     </script>
-           
   </body>
 </html>
