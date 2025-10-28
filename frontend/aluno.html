@@ -598,7 +598,7 @@
           };
 
           try {
-            const response = await fetch(`${API_URL}/${alunoId}/evolucao`, {
+            const response = await fetch(`${API_URL}/evolucao`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(dadosEvolucao),
@@ -662,28 +662,85 @@
       });
 
       // ----------------------------------------------------
-      // FUNÇÃO DE GERAÇÃO DE PDF (USANDO ROTA DO BACKEND)
+      // FUNÇÃO DE GERAÇÃO DE PDF
       // ----------------------------------------------------
 
       async function gerarPlanilhaPDF() {
-        if (!alunoId) {
-          alert("ID do aluno não encontrado.");
-          return;
-        }
-
+        const { jsPDF } = window.jspdf;
         const alunoNome =
           document.getElementById("aluno-nome-header").textContent;
-        const url = `${API_URL}/pdf/download/${alunoId}`;
+
+        // 1. Prepara o HTML para a captura
+        const treinoContainer = document.querySelector(".card:first-of-type");
+        const originalDisplay = treinoContainer.style.display;
+
+        // Aplica o CSS de impressão para garantir que todos os elementos do treino estejam visíveis
+        treinoContainer.classList.add("print-mode");
+
+        // Remove a parte de edição e o botão de download para a captura
+        const formEdicao = document.getElementById("form-edicao");
+        const btnDownload = document.getElementById("gerar-planilha-btn");
+        formEdicao.style.display = "none";
+        btnDownload.style.display = "none";
+
+        // Garante que todas as abas de treino estejam visíveis para a captura
+        const tabs = ["tab-a", "tab-b", "tab-c"];
+        tabs.forEach((tabId) => {
+          const tabContent = document.getElementById(tabId);
+          if (tabContent) tabContent.style.display = "block";
+        });
+
+        // Adiciona um título temporário e centraliza (para substituir o título indesejado)
+        const tituloTemp = document.createElement("h2");
+        tituloTemp.textContent = `PLANILHA DE TREINO - ${alunoNome}`;
+        tituloTemp.style.textAlign = "center";
+        tituloTemp.style.marginBottom = "20px";
+        treinoContainer.prepend(tituloTemp);
 
         try {
-          // Abre a URL em uma nova aba para iniciar o download do PDF gerado pelo backend
-          window.open(url, "_blank");
-          alert(`Download da Planilha de Treino de ${alunoNome} iniciado.`);
+          const canvas = await html2canvas(treinoContainer, {
+            scale: 2, // Aumenta a escala para melhor resolução
+            useCORS: true,
+            allowTaint: true,
+          });
+
+          const imgData = canvas.toDataURL("image/png");
+          const pdf = new jsPDF("p", "mm", "a4");
+          const imgWidth = 210; // A4 width in mm
+          const pageHeight = 297; // A4 height in mm
+          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+          let heightLeft = imgHeight;
+          let position = 0;
+
+          // Adiciona a primeira página
+          pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+
+          // Adiciona páginas restantes
+          while (heightLeft >= 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+          }
+
+          pdf.save(`Planilha_Treino_${alunoNome.replace(/\s/g, "_")}.pdf`);
+          alert("PDF gerado com sucesso!");
         } catch (error) {
-          console.error("Erro ao iniciar download do PDF:", error);
-          alert(
-            "Erro ao iniciar download do PDF. Verifique o console para mais detalhes."
-          );
+          console.error("Erro ao gerar PDF:", error);
+          alert("Erro ao gerar PDF. Verifique o console para mais detalhes.");
+        } finally {
+          // 2. Restaura o HTML original
+          formEdicao.style.display = "block";
+          btnDownload.style.display = "block";
+          tituloTemp.remove();
+          treinoContainer.classList.remove("print-mode"); // Remove a classe de impressão
+          // Restaura o estado original das abas (apenas a primeira ativa)
+          tabs.forEach((tabId, index) => {
+            const tabContent = document.getElementById(tabId);
+            if (tabContent)
+              tabContent.style.display = index === 0 ? "block" : "none";
+          });
         }
       }
 
